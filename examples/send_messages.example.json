@@ -1,0 +1,15 @@
+{
+  "_comment": "Copy this file (e.g. to send_messages.json), edit the values, then: python examples/send_dms_as_users.py --config send_messages.json --manifest sent.json",
+  "messages": [
+    {
+      "sender_email": "boss@yourorg.com",
+      "recipient_user_id": "U01ABCDEFGH",
+      "text": "Quick one — where do we land on the Acme renewal? Need a best/most-likely for the Q2 board readout by EOD tomorrow."
+    },
+    {
+      "sender_email": "customer@yourorg.com",
+      "recipient_user_id": "U01ABCDEFGH",
+      "text": "Hi — following up on the proposal you sent last week. Any chance you have 20 min this week to walk through it?"
+    }
+  ]
+}

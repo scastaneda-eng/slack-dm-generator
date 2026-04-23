@@ -1,0 +1,14 @@
+{
+  "_comment": "Copy this file to tokens.json (which is gitignored) and fill in real values. See SETUP.md for where to find each one.",
+  "oauth": {
+    "client_id": "PASTE_FROM_SLACK_APP_BASIC_INFO_PAGE",
+    "client_secret": "PASTE_FROM_SLACK_APP_BASIC_INFO_PAGE",
+    "redirect_uri": "https://localhost:3000/oauth/callback"
+  },
+  "users": {
+    "_example": "Filled in automatically by auth_user.py — one entry per persona email"
+  },
+  "_optional_audit_logging_comment": "Only fill in app_token + audit_channel_id if you want every send/delete logged to a Slack channel. See SETUP.md Step 8.",
+  "app_token": "",
+  "audit_channel_id": ""
+}
