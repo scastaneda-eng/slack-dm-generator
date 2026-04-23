@@ -1,7 +1,10 @@
 # Claude Code orientation
 
 This toolkit lets a Slack admin send and delete DMs as real users in their
-demo Slack org via per-user OAuth tokens. The user may or may not be a coder.
+demo Slack org via per-user OAuth tokens. The user may or may not be an
+experienced coder — assume they are using Terminal commands and Claude Code
+for the first time, and will need clear explanations and more context on
+how to install and implement this project.
 
 ## What you should do
 
