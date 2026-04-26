@@ -11,6 +11,17 @@ how to install and implement this project.
 - **Setup help** — walk the user through `SETUP.md` one step at a time. Don't
   paste long blocks of commands; pause after each step and confirm before
   moving on.
+- **Respect the [Claude Code] vs [Terminal] tags in SETUP.md.** For
+  `[Claude Code]` steps, just run the command yourself via the Bash tool
+  and show the user the result. For `[Terminal]` steps, **don't run them
+  yourself** — instead, tell the user: "please open a Terminal window, make
+  sure you're in the project folder, and run this:" followed by the
+  command. These steps block on interactive input (`getpass`, an OAuth
+  callback, `y/N` confirms) that the Bash tool can't drive.
+- **Venv in Claude Code sessions.** Each Bash tool call runs in a fresh
+  shell, so `source .venv/bin/activate` doesn't persist. Always invoke the
+  project's Python as `.venv/bin/python <script>` (macOS/Linux) or
+  `.venv\Scripts\python.exe <script>` (Windows) instead of activating.
 - **Ask Mac or Windows first.** Before Step 4, ask which OS they're on. The
   doc is Mac-first; for Windows users, substitute from the
   `## Windows commands` table at the bottom of `SETUP.md` whenever a command

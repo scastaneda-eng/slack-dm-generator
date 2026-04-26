@@ -7,13 +7,63 @@ Setup is one-time, ~15 minutes.
 
 ---
 
+## Before you start — if this is your first time with a terminal
+
+This guide assumes you may never have used Terminal, Python, or Claude Code
+before. That's fine — read this short primer and you'll be oriented.
+
+**Claude Code** is an AI assistant that runs inside a folder on your
+computer. You type a request in plain English and it can read your files
+and run commands for you. If you're reading this because Claude Code told
+you to, you already have it installed — you just type into the prompt.
+
+**Terminal** is the Mac/Linux app that lets you type commands directly to
+your computer (on Windows, the equivalent is **PowerShell**). You can open
+it from Spotlight: press `Cmd+Space`, type `Terminal`, hit Enter.
+
+**Every command below is tagged with where to run it:**
+
+- **[Claude Code]** — paste the command into your Claude Code prompt (or
+  just ask Claude to run it). Claude handles the typing for you.
+- **[Terminal]** — open a dedicated Terminal / PowerShell window and type
+  the command there. Use these for anything that takes over your screen
+  with prompts or hidden input.
+
+**About the working directory.** All the commands below assume you're
+"inside" the toolkit folder. In Claude Code that's automatic if you opened
+this folder. In a fresh Terminal window, you get there once with:
+
+```bash
+cd path/to/slack-dm-generator
+```
+
+Replace `path/to/` with wherever you cloned/downloaded it (e.g.
+`cd ~/claude-projects/slack-dm-generator`).
+
+**About `.venv` (Python virtual environment).** Step 4 creates a folder
+called `.venv` inside the project. It's a private, sandboxed copy of Python
+just for this toolkit — that way installing packages here won't affect the
+rest of your system. You'll see the `.venv/` folder appear; that's
+expected. `source .venv/bin/activate` (Step 4) tells *your current Terminal
+window* to use that sandbox. It only lasts for that window — open a new
+Terminal and you'd re-activate it. When running from Claude Code, each
+command runs in a fresh shell, so Claude will call `.venv/bin/python`
+directly instead of activating.
+
+---
+
 ## Prerequisites
 
 - **Slack admin** in your demo org (you need to install an app there).
 - **Python 3.12** — the macOS system Python (3.9) is too old.
+  **[Terminal]** (one-time system install):
   ```bash
   brew install python@3.12
   ```
+  > **Don't have Homebrew?** Homebrew is the standard Mac package manager.
+  > Install it once from https://brew.sh (a single command to paste into
+  > Terminal), then run `brew install python@3.12` above.
+  >
   > **On Windows?** Download the Python 3.12 installer from
   > https://www.python.org/downloads/ and **check "Add python.exe to PATH"**
   > on the first installer screen. When you hit a step below whose command
@@ -61,27 +111,44 @@ You'll paste these into `tokens.json` in Step 5.
 
 ## Step 4 — Set up Python
 
-From the toolkit directory:
+**[Claude Code]** Ask Claude to run these, or paste them into the prompt.
+If you're using Terminal instead, run them there — just make sure you've
+`cd`'d into the toolkit folder first (see "Before you start" above).
 
 ```bash
 python3.12 -m venv .venv
-source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-`.venv/` is gitignored. Activate it (`source .venv/bin/activate`) every new
-terminal session.
+You'll see a new `.venv/` folder appear in the project — that's the
+sandboxed Python install. It's gitignored, so it won't be committed.
+
+**If you're working in a dedicated Terminal window (not Claude Code),**
+also run this once per new Terminal window, so your shell uses the sandbox:
+
+```bash
+source .venv/bin/activate
+```
+
+You'll know it worked when your prompt gains a `(.venv)` prefix. You do
+**not** need to run `source ...` inside Claude Code — Claude calls
+`.venv/bin/python` directly.
 
 ---
 
 ## Step 5 — Create `tokens.json`
+
+**[Claude Code]** Ask Claude to run this, or do it yourself in Terminal:
 
 ```bash
 cp tokens.example.json tokens.json
 ```
 
 Open `tokens.json` and fill in `oauth.client_id` and `oauth.client_secret`
-from Step 3. Leave everything else as-is for now.
+from Step 3. Leave everything else as-is for now. (If you're in Claude
+Code, you can ask Claude to open the file and help you edit it — just
+paste the client ID/secret from the Slack web UI; don't paste other
+tokens.)
 
 > ⚠ **Never paste tokens into a chat with Claude Code.** Always use the
 > local scripts (`auth_user.py` for user tokens, `save_bot_token.py` for the
@@ -90,6 +157,10 @@ from Step 3. Leave everything else as-is for now.
 ---
 
 ## Step 6 — Capture per-persona tokens
+
+**[Terminal]** — run this in a dedicated Terminal window, not Claude Code.
+(The script prints a URL, then waits for your browser to complete OAuth.
+You need to watch it live and have the window stay open.)
 
 For each user you want to impersonate (e.g., a CRO persona, a customer
 persona, a deal-desk persona):
@@ -129,16 +200,21 @@ Repeat for every persona.
 
 ## Step 7 — Verify
 
+**[Claude Code]** (or Terminal, either works):
+
 ```bash
 python verify_setup.py
 ```
 
 Should print every persona email + matching user ID and end with
 `READY — all checks passed.` If anything is flagged, fix it before moving on.
+In Claude Code, Claude can run this and read the output back to you.
 
 ---
 
 ## Step 8 — Send a test DM
+
+**[Claude Code]** (or Terminal — both commands here are non-interactive):
 
 1. Copy the example config:
    ```bash
@@ -146,7 +222,8 @@ Should print every persona email + matching user ID and end with
    ```
 2. Edit `my_demo.json` — replace the `sender_email` (must be one of your
    captured personas) and `recipient_user_id` (the Slack user ID of who
-   should receive the DM).
+   should receive the DM). In Claude Code, you can ask Claude to open and
+   edit the file for you.
 3. Send:
    ```bash
    python examples/send_dms_as_users.py --config my_demo.json --manifest sent.json
@@ -168,20 +245,28 @@ If you want every send/delete logged automatically to a Slack channel:
    Right-click → **View channel details** → copy the channel ID at the
    bottom (starts with `C`).
 2. In your existing Slack app, go to **OAuth & Permissions** → add **Bot
-   Token Scopes**: `chat:write`, `chat:write.public`.
+   Token Scopes**: `chat:write`, `chat:write.public`, `users:read.email`.
+   > ℹ `users:read.email` is what `auth_user.py` and `verify_setup.py` use
+   > for strict persona verification (they look up the email you passed
+   > with `--email` and confirm it matches the captured token). Without
+   > this scope, you'll see a `missing_scope` error during verification.
 3. Reinstall the app. Copy the new **Bot User OAuth Token** (`xoxb-...`)
    from the **Install App** page.
    > ℹ Reinstalling the app does **not** invalidate already-captured
    > `xoxp-` user tokens.
-4. Run:
+4. **[Terminal]** — run this in a dedicated Terminal window (the script
+   uses a hidden paste prompt and a `y/N` confirm, which Claude Code's
+   runner can't drive):
    ```bash
    python save_bot_token.py
    ```
-   Paste the `xoxb-` when prompted (it's hidden via `getpass`).
+   Paste the `xoxb-` when prompted. **Your keystrokes won't appear on
+   screen — that's intentional (`getpass` hides them so tokens don't show
+   up in scrollback). Just paste and press Enter.**
 5. Open `tokens.json` and set `audit_channel_id` to the channel ID from
    step 1.
-6. Re-run `python verify_setup.py` — you should now see audit logging
-   green.
+6. **[Claude Code]** Re-run `python verify_setup.py` — you should now see
+   audit logging green.
 
 If you don't do this, audit logging silently no-ops. The toolkit still works.
 

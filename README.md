@@ -4,6 +4,11 @@ Send and delete DMs as real users in your Slack demo org via per-user OAuth.
 Useful for seeding a "lived-in" inbox before a demo (DMs from a CRO, a
 customer, a deal-desk partner, etc.) and cleaning up afterward.
 
+> **New to Terminal or Claude Code?** You're the target reader.
+> [SETUP.md](SETUP.md) explains each command in plain language and tells you
+> exactly where to run it (inside Claude Code, or in a dedicated Terminal
+> window).
+
 ## Get started
 
 Read [SETUP.md](SETUP.md). Setup is ~15 minutes. You'll need:
