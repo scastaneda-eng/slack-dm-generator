@@ -21,12 +21,3 @@ Read [SETUP.md](SETUP.md). Setup is ~15 minutes. You'll need:
 Open this folder in Claude Code and ask: *"help me set this up."*
 [CLAUDE.md](CLAUDE.md) tells Claude how to handle the gotchas (incognito for
 OAuth, never paste tokens in chat, what to do if verification fails, etc.).
-
-## What this toolkit does NOT do
-
-- No channel create/archive/delete
-- No admin user management
-- No AI agent simulation
-- No Salesforce / external integrations
-
-It's deliberately scoped to user impersonation + DM send/delete.
