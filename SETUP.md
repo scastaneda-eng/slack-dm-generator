@@ -14,8 +14,14 @@ Setup is one-time, ~15 minutes.
   ```bash
   brew install python@3.12
   ```
-- **macOS or Linux** — `openssl` is required to generate the local OAuth
-  cert. Pre-installed on both.
+  > **On Windows?** Download the Python 3.12 installer from
+  > https://www.python.org/downloads/ and **check "Add python.exe to PATH"**
+  > on the first installer screen. When you hit a step below whose command
+  > starts with `source`, `cp`, or `python3.12`, swap it for the Windows
+  > equivalent in the [Windows commands](#windows-commands) table at the
+  > bottom of this file. Every other command is identical.
+- **macOS, Linux, or Windows** — the toolkit generates its own OAuth cert
+  using a pure-Python library, so you don't need `openssl` installed.
 
 ---
 
@@ -235,3 +241,46 @@ matches the user that originally sent the DM.
 **`chat.postMessage` returns `not_in_channel`** — Only happens for channels,
 not DMs. If you see this for a DM, double-check the `recipient_user_id` is
 a user ID (starts with `U`), not a channel ID.
+
+**`'source' is not recognized as an internal or external command`** — You're
+on Windows. Use `.venv\Scripts\Activate.ps1` instead of
+`source .venv/bin/activate`. See [Windows commands](#windows-commands) below.
+
+**`.venv\Scripts\Activate.ps1 cannot be loaded because running scripts is
+disabled on this system`** — PowerShell's default execution policy blocks
+the activation script. Run this once, then retry:
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+**`'python' is not recognized`** (Windows) — Python wasn't added to PATH
+during install. Easiest fix: reinstall from python.org and check **"Add
+python.exe to PATH"** on the first screen. Or use the Python launcher:
+replace `python` with `py` and `python3.12` with `py -3.12`.
+
+---
+
+## Windows commands
+
+Windows users: Steps 1–3 are in the Slack web UI and work as written.
+Everything from Step 4 onward runs in **PowerShell** (search "PowerShell" in
+the Start menu). Only the commands in this table differ from the main flow
+above — anything that starts with `python` (e.g.,
+`python -u auth_user.py ...`, `python verify_setup.py`,
+`python examples/send_dms_as_users.py ...`) runs identically.
+
+| Step | Mac/Linux (main flow) | Windows (PowerShell) |
+|---|---|---|
+| 4 — create venv | `python3.12 -m venv .venv` | `py -3.12 -m venv .venv` |
+| 4 — activate venv | `source .venv/bin/activate` | `.venv\Scripts\Activate.ps1` |
+| 5 — copy tokens file | `cp tokens.example.json tokens.json` | `Copy-Item tokens.example.json tokens.json` |
+| 8 — copy example config | `cp examples/send_messages.example.json my_demo.json` | `Copy-Item examples\send_messages.example.json my_demo.json` |
+
+**First-time PowerShell note:** If activating the venv fails with
+"running scripts is disabled on this system," run
+`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` once and retry. This
+is a one-time per-user setting.
+
+**Incognito windows on Windows:** For the OAuth step, open a private
+browsing window — **Ctrl+Shift+N** in Chrome/Edge, **Ctrl+Shift+P** in
+Firefox. (On Mac, it's `Cmd` instead of `Ctrl`.)

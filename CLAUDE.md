@@ -11,6 +11,10 @@ how to install and implement this project.
 - **Setup help** — walk the user through `SETUP.md` one step at a time. Don't
   paste long blocks of commands; pause after each step and confirm before
   moving on.
+- **Ask Mac or Windows first.** Before Step 4, ask which OS they're on. The
+  doc is Mac-first; for Windows users, substitute from the
+  `## Windows commands` table at the bottom of `SETUP.md` whenever a command
+  starts with `source`, `cp`, or `python3.12`. Everything else is identical.
 - **After token capture** — always run `python verify_setup.py` and read the
   output before declaring setup done.
 - **Sending DMs** — copy `examples/send_messages.example.json` to a new file,
@@ -35,7 +39,9 @@ admin account), Slack silently grants THAT user's token. The script's
 post-capture check (`auth.test` + `users.lookupByEmail`) catches this and
 refuses to save — but to avoid the round trip, **tell the user upfront** to
 copy the printed URL into an **incognito** window logged in as the target
-persona.
+persona. Incognito shortcut: `Cmd+Shift+N` (Chrome/Edge on Mac),
+`Ctrl+Shift+N` (Chrome/Edge on Windows), or `Ctrl+Shift+P` /
+`Cmd+Shift+P` (Firefox).
 
 If the user has `app_token` configured in `tokens.json`, verification is
 strict (lookupByEmail). If not, verification falls back to a heuristic
