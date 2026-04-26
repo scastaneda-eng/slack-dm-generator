@@ -6,13 +6,12 @@ behalf of persona accounts (a CRO, a customer, a deal-desk partner, etc.) so
 the environment looks naturally active rather than empty. When the demo is
 over, clean up all the seeded messages in one step.
 
-Built for internal Slack demo orgs only. It does not connect to customer
-workspaces or production environments.
+This app walks you through authorizing one or more demo personas so you can
+send messages on their behalf — all via API calls through your AI coding agent.
 
-> **New to Terminal or Claude Code?** You're the target reader.
-> [SETUP.md](SETUP.md) explains each command in plain language and tells you
-> exactly where to run it (inside Claude Code, or in a dedicated Terminal
-> window).
+> **New to Vibe Coding or Terminal commands?** No problem. You can ask your
+> agent for clarification or step-by-step instructions at any point. This
+> project was built with beginner coders in mind.
 
 ## Get started
 
