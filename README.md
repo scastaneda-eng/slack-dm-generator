@@ -1,8 +1,13 @@
 # slack-dm-generator
 
-Send and delete DMs as real users in your Slack demo org via per-user OAuth.
-Useful for seeding a "lived-in" inbox before a demo (DMs from a CRO, a
-customer, a deal-desk partner, etc.) and cleaning up afterward.
+A demo preparation tool for Slack Solutions Engineers. Use it to seed a
+realistic, "lived-in" Slack inbox before a customer demo — sending DMs on
+behalf of persona accounts (a CRO, a customer, a deal-desk partner, etc.) so
+the environment looks naturally active rather than empty. When the demo is
+over, clean up all the seeded messages in one step.
+
+Built for internal Slack demo orgs only. It does not connect to customer
+workspaces or production environments.
 
 > **New to Terminal or Claude Code?** You're the target reader.
 > [SETUP.md](SETUP.md) explains each command in plain language and tells you
