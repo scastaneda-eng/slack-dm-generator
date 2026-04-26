@@ -1,4 +1,4 @@
-# slack-dm-generator 
+# slack-dm-generator
 
 Send and delete DMs as real users in your Slack demo org via per-user OAuth.
 Useful for seeding a "lived-in" inbox before a demo (DMs from a CRO, a
