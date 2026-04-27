@@ -1,7 +1,7 @@
 # slack-dm-generator — Setup
 
 This toolkit lets you **send and delete DMs as real users** in your Slack
-demo org. Useful for seeding a "lived-in" inbox before a demo.
+demo org. Useful for generating a "lived-in" Today View and message inbox before a demo.
 
 Setup is one-time, ~15 minutes.
 
