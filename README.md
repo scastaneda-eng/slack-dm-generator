@@ -1,9 +1,9 @@
 # slack-dm-generator
 
 A demo preparation tool for Slack Solutions Engineers. Use it to seed a
-realistic, "lived-in" Slack inbox before a customer demo — sending DMs on
+realistic, active view of the Today View in Slack before a customer demo — sending DMs on
 behalf of persona accounts (a CRO, a customer, a deal-desk partner, etc.) so
-the environment looks naturally active rather than empty. When the demo is
+the environment looks naturally active, with pending messages from other users. When the demo is
 over, clean up all the seeded messages in one step.
 
 This app walks you through authorizing one or more demo personas so you can
