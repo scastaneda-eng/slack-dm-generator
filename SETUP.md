@@ -172,12 +172,21 @@ python -u auth_user.py --email persona@yourorg.com
 > ⚠ Use `python -u` (unbuffered) so the OAuth URL prints **before** the
 > script blocks waiting for the callback.
 
+> 🪄 **Before you run the script:** open an incognito/private browser
+> window and log in to Slack as the target persona using that persona's
+> Demo Zone Magic Link. Keep that window open — you'll paste the OAuth
+> URL into it in a moment.
+>
+> Incognito shortcut: `Cmd+Shift+N` (Chrome/Edge on Mac),
+> `Ctrl+Shift+N` (Chrome/Edge on Windows), `Cmd+Shift+P` / `Ctrl+Shift+P`
+> (Firefox).
+
 The script will print an OAuth URL. **STOP** — read this carefully:
 
-> ⚠ **Critical: open the URL in an INCOGNITO window** logged in as the
-> target persona. Do NOT use your default browser if you're logged in there
-> as a different user (e.g., your admin account). If you do, Slack will
-> silently grant the wrong user's token.
+> ⚠ **Paste the URL into the incognito window you just opened** (the one
+> logged in as the target persona). Do NOT use your default browser —
+> if you're signed in there as a different user (e.g., your admin
+> account), Slack will silently grant the wrong user's token.
 
 > ℹ The script also tries to open your default browser as a convenience —
 > ignore that tab if it goes to the wrong account.
