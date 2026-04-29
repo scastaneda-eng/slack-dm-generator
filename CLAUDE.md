@@ -11,6 +11,10 @@ how to install and implement this project.
 - **Setup help** — walk the user through `SETUP.md` one step at a time. Don't
   paste long blocks of commands; pause after each step and confirm before
   moving on.
+- **Showing the manifest** — when the user hits Step 1 (the "paste the
+  manifest into Slack" step), open `manifest.json` with the Read tool and
+  show the full JSON in chat so the user can copy it. The manifest is
+  fixed (pre-configured app name, scopes, redirect URL) — don't edit it.
 - **Respect the [Claude Code] vs [Terminal] tags in SETUP.md.** For
   `[Claude Code]` steps, just run the command yourself via the Bash tool
   and show the user the result. For `[Terminal]` steps, **don't run them
@@ -63,7 +67,10 @@ working with multiple personas.
 
 If the user needs to rotate tokens:
 1. Rotate via Slack app UI (Basic Information page for client secret;
-   reinstall app for new bot/user tokens).
+   reinstall app for new bot/user tokens). Scopes themselves are pinned by
+   `manifest.json` — if the user ever needs to change scopes, tell them to
+   go to **Features → App Manifest** in the Slack app UI and paste an
+   updated `manifest.json`, then reinstall.
 2. For the bot token: `python save_bot_token.py` (getpass).
 3. For user tokens: re-run `auth_user.py --email <email>` per persona.
 4. Reinstalling the app does NOT invalidate already-captured `xoxp-` tokens,

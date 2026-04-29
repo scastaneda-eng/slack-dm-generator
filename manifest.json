@@ -1,0 +1,33 @@
+{
+  "display_information": {
+    "name": "Demo DM Helper",
+    "description": "Send and delete DMs as persona users for Slack demo prep.",
+    "background_color": "#2c2d30"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "Demo DM Helper",
+      "always_online": false
+    }
+  },
+  "oauth_config": {
+    "redirect_urls": [
+      "https://localhost:3000/oauth/callback"
+    ],
+    "scopes": {
+      "user": [
+        "chat:write"
+      ],
+      "bot": [
+        "chat:write",
+        "chat:write.public",
+        "users:read.email"
+      ]
+    }
+  },
+  "settings": {
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}

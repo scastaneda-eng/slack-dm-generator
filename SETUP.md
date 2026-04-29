@@ -40,11 +40,11 @@ cd path/to/slack-dm-generator
 Replace `path/to/` with wherever you cloned/downloaded it (e.g.
 `cd ~/claude-projects/slack-dm-generator`).
 
-**About `.venv` (Python virtual environment).** Step 4 creates a folder
+**About `.venv` (Python virtual environment).** Step 3 creates a folder
 called `.venv` inside the project. It's a private, sandboxed copy of Python
 just for this toolkit — that way installing packages here won't affect the
 rest of your system. You'll see the `.venv/` folder appear; that's
-expected. `source .venv/bin/activate` (Step 4) tells *your current Terminal
+expected. `source .venv/bin/activate` (Step 3) tells *your current Terminal
 window* to use that sandbox. It only lasts for that window — open a new
 Terminal and you'd re-activate it. When running from Claude Code, each
 command runs in a fresh shell, so Claude will call `.venv/bin/python`
@@ -75,41 +75,45 @@ directly instead of activating.
 
 ---
 
-## Step 1 — Create the Slack app
+## Step 1 — `[Slack web UI]` Create the Slack app from the manifest
 
-1. Go to https://api.slack.com/apps → **Create New App** → **From scratch**.
-2. Name it anything (e.g., `Demo DM Helper`). Pick your demo workspace.
+1. Open https://api.slack.com/apps in your browser.
+2. Click **Create New App** → **From an app manifest**.
+3. Pick your demo workspace.
+4. Open `manifest.json` (in this folder) and paste the whole file into Slack's
+   manifest box.
+   > **In Claude Code**, ask Claude to open `manifest.json` and show it to you
+   > — you can copy it from there.
+5. Click **Next**, review the summary, then **Create**.
 
----
-
-## Step 2 — Configure OAuth
-
-1. In the app settings, go to **OAuth & Permissions**.
-2. Under **Redirect URLs**, add:
-   ```
-   https://localhost:3000/oauth/callback
-   ```
-   > ⚠ **Must be `https://`** — Slack rejects `http://localhost`. The toolkit
-   > generates a self-signed cert for this on first run.
-3. Under **User Token Scopes**, add `chat:write`.
-   > ℹ `chat:write` is sufficient for both DM **send** and DM **delete**.
-   > You don't need `im:read` or `im:write` (counterintuitive but true).
-4. Save changes.
+> **What is a manifest?** A JSON file that pre-fills every setting for your
+> Slack app — name, redirect URL, scopes (permissions), bot user — so you
+> don't have to click through a dozen forms. The file ships with this toolkit;
+> you don't need to edit it.
 
 ---
 
-## Step 3 — Get the OAuth credentials
+## Step 2 — `[Slack web UI]` Install the app and copy OAuth credentials
 
-1. In the app settings, go to **Basic Information**.
-2. Under **App Credentials**, copy:
+1. On your app's page at api.slack.com, click **Install to Workspace** and
+   review the permissions, then click **Allow**.
+2. Click **Basic Information** in the sidebar. Under **App Credentials**, copy:
    - **Client ID**
    - **Client Secret** (click "Show")
 
-You'll paste these into `tokens.json` in Step 5.
+   You'll paste these into `tokens.json` in Step 4.
+3. (Only if you plan to turn on audit logging in Step 8.) In the sidebar, click
+   **OAuth & Permissions** and copy the **Bot User OAuth Token** (starts with
+   `xoxb-`). Keep it handy — you'll use it in Step 8.
+
+> ℹ The manifest already configured `https://localhost:3000/oauth/callback` as
+> the redirect URL, added the `chat:write` user scope (covers DM **send** and
+> **delete**), and added the bot scopes needed for optional audit logging.
+> Nothing to click there.
 
 ---
 
-## Step 4 — Set up Python
+## Step 3 — Set up Python
 
 **[Claude Code]** Ask Claude to run these, or paste them into the prompt.
 If you're using Terminal instead, run them there — just make sure you've
@@ -136,7 +140,7 @@ You'll know it worked when your prompt gains a `(.venv)` prefix. You do
 
 ---
 
-## Step 5 — Create `tokens.json`
+## Step 4 — Create `tokens.json`
 
 **[Claude Code]** Ask Claude to run this, or do it yourself in Terminal:
 
@@ -145,7 +149,7 @@ cp tokens.example.json tokens.json
 ```
 
 Open `tokens.json` and fill in `oauth.client_id` and `oauth.client_secret`
-from Step 3. Leave everything else as-is for now. (If you're in Claude
+from Step 2. Leave everything else as-is for now. (If you're in Claude
 Code, you can ask Claude to open the file and help you edit it — just
 paste the client ID/secret from the Slack web UI; don't paste other
 tokens.)
@@ -156,7 +160,7 @@ tokens.)
 
 ---
 
-## Step 6 — Capture per-persona tokens
+## Step 5 — Capture per-persona tokens
 
 **[Terminal]** — run this in a dedicated Terminal window, not Claude Code.
 (The script prints a URL, then waits for your browser to complete OAuth.
@@ -207,7 +211,7 @@ Repeat for every persona.
 
 ---
 
-## Step 7 — Verify
+## Step 6 — Verify
 
 **[Claude Code]** (or Terminal, either works):
 
@@ -221,7 +225,7 @@ In Claude Code, Claude can run this and read the output back to you.
 
 ---
 
-## Step 8 — Send a test DM
+## Step 7 — Send a test DM
 
 **[Claude Code]** (or Terminal — both commands here are non-interactive):
 
@@ -246,38 +250,36 @@ python examples/delete_dms.py --manifest sent.json
 
 ---
 
-## Step 9 (optional) — Audit logging
+## Step 8 (optional) — Audit logging
 
 If you want every send/delete logged automatically to a Slack channel:
 
 1. Create a dedicated channel in your demo org (e.g., `#demo-audit-log`).
    Right-click → **View channel details** → copy the channel ID at the
    bottom (starts with `C`).
-2. In your existing Slack app, go to **OAuth & Permissions** → add **Bot
-   Token Scopes**: `chat:write`, `chat:write.public`, `users:read.email`.
-   > ℹ `users:read.email` is what `auth_user.py` and `verify_setup.py` use
-   > for strict persona verification (they look up the email you passed
-   > with `--email` and confirm it matches the captured token). Without
-   > this scope, you'll see a `missing_scope` error during verification.
-3. Reinstall the app. Copy the new **Bot User OAuth Token** (`xoxb-...`)
-   from the **Install App** page.
-   > ℹ Reinstalling the app does **not** invalidate already-captured
-   > `xoxp-` user tokens.
-4. **[Terminal]** — run this in a dedicated Terminal window (the script
+2. **[Terminal]** — run this in a dedicated Terminal window (the script
    uses a hidden paste prompt and a `y/N` confirm, which Claude Code's
    runner can't drive):
    ```bash
    python save_bot_token.py
    ```
-   Paste the `xoxb-` when prompted. **Your keystrokes won't appear on
-   screen — that's intentional (`getpass` hides them so tokens don't show
-   up in scrollback). Just paste and press Enter.**
-5. Open `tokens.json` and set `audit_channel_id` to the channel ID from
+   Paste the `xoxb-` token you copied in Step 2. **Your keystrokes won't
+   appear on screen — that's intentional (`getpass` hides them so tokens
+   don't show up in scrollback). Just paste and press Enter.**
+   > ℹ Didn't copy the bot token in Step 2? Go back to your app at
+   > api.slack.com → **OAuth & Permissions** → copy the **Bot User OAuth
+   > Token** (`xoxb-...`) and return here.
+3. Open `tokens.json` and set `audit_channel_id` to the channel ID from
    step 1.
-6. **[Claude Code]** Re-run `python verify_setup.py` — you should now see
+4. **[Claude Code]** Re-run `python verify_setup.py` — you should now see
    audit logging green.
 
 If you don't do this, audit logging silently no-ops. The toolkit still works.
+
+> ℹ The manifest already ships the bot scopes this feature needs
+> (`chat:write`, `chat:write.public`, `users:read.email`), so there's no
+> reinstall step — just run `save_bot_token.py` with the token that was
+> generated when you installed the app in Step 2.
 
 ---
 
@@ -316,7 +318,7 @@ Reinstalling the app does **not** invalidate existing user (`xoxp-`) tokens.
 ## Troubleshooting
 
 **`auth_user.py` exits with "Missing or unset oauth.client_id"** — You
-haven't filled in `tokens.json`. See Step 5.
+haven't filled in `tokens.json`. See Step 4.
 
 **Browser shows "Your connection is not private"** — Expected. The toolkit
 uses a self-signed cert for the OAuth callback. Click **advanced → proceed**.
@@ -356,8 +358,8 @@ replace `python` with `py` and `python3.12` with `py -3.12`.
 
 ## Windows commands
 
-Windows users: Steps 1–3 are in the Slack web UI and work as written.
-Everything from Step 4 onward runs in **PowerShell** (search "PowerShell" in
+Windows users: Steps 1–2 are in the Slack web UI and work as written.
+Everything from Step 3 onward runs in **PowerShell** (search "PowerShell" in
 the Start menu). Only the commands in this table differ from the main flow
 above — anything that starts with `python` (e.g.,
 `python -u auth_user.py ...`, `python verify_setup.py`,
@@ -365,10 +367,10 @@ above — anything that starts with `python` (e.g.,
 
 | Step | Mac/Linux (main flow) | Windows (PowerShell) |
 |---|---|---|
-| 4 — create venv | `python3.12 -m venv .venv` | `py -3.12 -m venv .venv` |
-| 4 — activate venv | `source .venv/bin/activate` | `.venv\Scripts\Activate.ps1` |
-| 5 — copy tokens file | `cp tokens.example.json tokens.json` | `Copy-Item tokens.example.json tokens.json` |
-| 8 — copy example config | `cp examples/send_messages.example.json my_demo.json` | `Copy-Item examples\send_messages.example.json my_demo.json` |
+| 3 — create venv | `python3.12 -m venv .venv` | `py -3.12 -m venv .venv` |
+| 3 — activate venv | `source .venv/bin/activate` | `.venv\Scripts\Activate.ps1` |
+| 4 — copy tokens file | `cp tokens.example.json tokens.json` | `Copy-Item tokens.example.json tokens.json` |
+| 7 — copy example config | `cp examples/send_messages.example.json my_demo.json` | `Copy-Item examples\send_messages.example.json my_demo.json` |
 
 **First-time PowerShell note:** If activating the venv fails with
 "running scripts is disabled on this system," run
