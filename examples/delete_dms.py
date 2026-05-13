@@ -19,6 +19,7 @@ from slack_sdk.errors import SlackApiError
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import audit_log, user_client  # noqa: E402
+from errors import friendly_slack_error  # noqa: E402
 from retry import retry_on_rate_limit  # noqa: E402
 
 
@@ -38,7 +39,7 @@ def delete_one(sender_email: str, recipient_user_id: str, target_ts: str) -> tup
     try:
         probe = _probe(client, recipient_user_id)
     except SlackApiError as e:
-        return False, f"probe post failed: {e.response.get('error')}"
+        return False, f"probe post failed: {friendly_slack_error(e)}"
     channel = probe["channel"]
     probe_ts = probe["ts"]
 
@@ -46,13 +47,13 @@ def delete_one(sender_email: str, recipient_user_id: str, target_ts: str) -> tup
     try:
         _delete(client, channel, target_ts)
     except SlackApiError as e:
-        target_err = e.response.get("error")
+        target_err = friendly_slack_error(e)
 
     probe_err = None
     try:
         _delete(client, channel, probe_ts)
     except SlackApiError as e:
-        probe_err = e.response.get("error")
+        probe_err = friendly_slack_error(e)
 
     if target_err and probe_err:
         return False, (

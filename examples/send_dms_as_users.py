@@ -33,6 +33,7 @@ from slack_sdk.errors import SlackApiError
 # from repo root or examples/.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import audit_log, user_client  # noqa: E402
+from errors import friendly_slack_error  # noqa: E402
 from retry import retry_on_rate_limit  # noqa: E402
 
 # Slack user IDs are uppercase alphanumeric, prefixed with U or W (workspace).
@@ -71,7 +72,7 @@ def main() -> int:
         try:
             entry = send_one(msg["sender_email"], msg["recipient_user_id"], msg["text"])
         except (SlackApiError, RuntimeError) as e:
-            err = e.response.get("error") if isinstance(e, SlackApiError) else str(e)
+            err = friendly_slack_error(e) if isinstance(e, SlackApiError) else str(e)
             print(f"[fail] {msg.get('sender_email')!r}: {err}", file=sys.stderr)
             audit_log(
                 f":warning: DM seed failed — {msg.get('sender_email')} -> "
