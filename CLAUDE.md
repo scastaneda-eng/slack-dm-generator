@@ -58,6 +58,14 @@ persona. Incognito shortcut: `Cmd+Shift+N` (Chrome/Edge on Mac),
 `Ctrl+Shift+N` (Chrome/Edge on Windows), or `Ctrl+Shift+P` /
 `Cmd+Shift+P` (Firefox).
 
+**When running `auth_user.py` from a Claude Code session yourself, always
+pass `--no-open`** (`python -u auth_user.py --email <email> --no-open`).
+That suppresses the default-browser auto-open so only the URL prints in
+chat — the user copies it into incognito intentionally, and there's no
+risk of an extra browser tab silently authorizing the wrong account.
+Document the flag for the user too if they're running the command in
+their own Terminal.
+
 If the user has `app_token` configured in `tokens.json`, verification is
 strict (lookupByEmail). If not, verification falls back to a heuristic
 name-match. Recommend they set up `app_token` for strict verification when

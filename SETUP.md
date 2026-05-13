@@ -176,6 +176,21 @@ python -u auth_user.py --email persona@yourorg.com
 > ⚠ Use `python -u` (unbuffered) so the OAuth URL prints **before** the
 > script blocks waiting for the callback.
 
+> 🛑 **Add `--no-open` if you're running this via Claude Code** (or any time
+> your default browser is signed into Slack as someone other than the target
+> persona):
+>
+> ```bash
+> python -u auth_user.py --email persona@yourorg.com --no-open
+> ```
+>
+> Without `--no-open`, the script auto-opens your default browser on top of
+> the URL it prints. If that browser is logged into Slack as a different
+> account (very common — your admin account is usually open there), it's
+> easy to accidentally click "Allow" in the wrong window and authorize as
+> the wrong user. The verification step will catch and reject it, but
+> `--no-open` avoids the round trip entirely.
+
 > 🪄 **Before you run the script:** open an incognito/private browser
 > window and log in to Slack as the target persona using that persona's
 > Demo Zone Magic Link. Keep that window open — you'll paste the OAuth

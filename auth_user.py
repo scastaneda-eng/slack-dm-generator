@@ -186,6 +186,16 @@ def verify_token_matches_email(token: str, expected_email: str, app_token: str |
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--email", required=True, help="Email of the user you're authorizing as")
+    parser.add_argument(
+        "--no-open",
+        action="store_true",
+        help=(
+            "Print the OAuth URL only; don't auto-open the default browser. "
+            "Recommended when running via Claude Code, or whenever your default "
+            "browser is signed into Slack as a different user — the auto-open can "
+            "lead to authorizing as the wrong account."
+        ),
+    )
     args = parser.parse_args()
 
     tokens = load_tokens()
@@ -215,13 +225,18 @@ def main() -> int:
     print("there as a different user — Slack will silently grant the wrong user's")
     print("token and the verification step below will reject it.")
     print()
-    print("(I'll also try to open your default browser as a convenience — ignore")
-    print("it if you don't need it.)")
+    if args.no_open:
+        print("(--no-open passed — not opening your default browser. Paste the URL")
+        print("above into your incognito window manually.)")
+    else:
+        print("(I'll also try to open your default browser as a convenience — ignore")
+        print("it if you don't need it. Pass --no-open to skip the auto-open.)")
     print()
     print("Note: your browser will warn about the self-signed cert on localhost —")
     print("click 'advanced -> proceed' to continue.")
     print()
-    webbrowser.open(url)
+    if not args.no_open:
+        webbrowser.open(url)
 
     captured = run_server_until_callback(state)
     result = exchange_code(captured["code"], client_id, client_secret, redirect_uri)
