@@ -23,17 +23,29 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
 from slack_sdk.errors import SlackApiError
 
-# Make `from config import ...` work whether run from repo root or examples/.
+# Make `from config import ...` and `from retry import ...` work whether run
+# from repo root or examples/.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import audit_log, user_client  # noqa: E402
+from retry import retry_on_rate_limit  # noqa: E402
+
+# Slack user IDs are uppercase alphanumeric, prefixed with U or W (workspace).
+USER_ID_RE = re.compile(r"^[UW][A-Z0-9]{8,}$")
 
 
+@retry_on_rate_limit()
 def send_one(sender_email: str, recipient_user_id: str, text: str) -> dict:
+    if not USER_ID_RE.match(recipient_user_id):
+        raise RuntimeError(
+            f"recipient_user_id {recipient_user_id!r} doesn't look like a Slack user ID "
+            f"(expected something like U01ABCDEFGH)"
+        )
     client = user_client(sender_email)
     resp = client.chat_postMessage(channel=recipient_user_id, text=text)
     return {

@@ -19,13 +19,24 @@ from slack_sdk.errors import SlackApiError
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from config import audit_log, user_client  # noqa: E402
+from retry import retry_on_rate_limit  # noqa: E402
+
+
+@retry_on_rate_limit()
+def _probe(client, recipient_user_id: str):
+    return client.chat_postMessage(channel=recipient_user_id, text=".")
+
+
+@retry_on_rate_limit()
+def _delete(client, channel: str, ts: str):
+    return client.chat_delete(channel=channel, ts=ts)
 
 
 def delete_one(sender_email: str, recipient_user_id: str, target_ts: str) -> tuple[bool, str]:
     client = user_client(sender_email)
 
     try:
-        probe = client.chat_postMessage(channel=recipient_user_id, text=".")
+        probe = _probe(client, recipient_user_id)
     except SlackApiError as e:
         return False, f"probe post failed: {e.response.get('error')}"
     channel = probe["channel"]
@@ -33,18 +44,25 @@ def delete_one(sender_email: str, recipient_user_id: str, target_ts: str) -> tup
 
     target_err = None
     try:
-        client.chat_delete(channel=channel, ts=target_ts)
+        _delete(client, channel, target_ts)
     except SlackApiError as e:
         target_err = e.response.get("error")
 
+    probe_err = None
     try:
-        client.chat_delete(channel=channel, ts=probe_ts)
+        _delete(client, channel, probe_ts)
     except SlackApiError as e:
-        if target_err is None:
-            return False, f"target deleted but probe cleanup failed: {e.response.get('error')}"
+        probe_err = e.response.get("error")
 
+    if target_err and probe_err:
+        return False, (
+            f"chat.delete failed: {target_err}; probe cleanup also failed "
+            f"({probe_err}) — leaving an orphan probe message in channel {channel}"
+        )
     if target_err:
         return False, f"chat.delete failed: {target_err}"
+    if probe_err:
+        return False, f"target deleted but probe cleanup failed: {probe_err}"
     return True, channel
 
 
