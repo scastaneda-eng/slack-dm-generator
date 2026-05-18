@@ -20,12 +20,12 @@ through your AI coding agent.
 
 You can follow setup either way, whichever you're more comfortable with:
 
-- **Read [SETUP.md](SETUP.md) yourself.** Step-by-step instructions, ~15 minutes.
 - **Open this folder in Claude Code and ask *"help me set this up."*** Claude reads [SETUP.md](SETUP.md) and
   [CLAUDE.md](CLAUDE.md), then walks you through it one step at a time —
   pausing for confirmation, running commands for you when safe, and handling
   the gotchas (incognito for OAuth, never paste tokens in chat, what to do
   if verification fails). Best for first-time Terminal users.
+- **Read [SETUP.md](SETUP.md) yourself.** Step-by-step instructions, ~15 minutes.
 
 Either way you'll need:
 - Admin access to your demo Slack org
