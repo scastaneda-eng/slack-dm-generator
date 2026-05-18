@@ -2,7 +2,7 @@
 
 A demo preparation tool for Slack Solutions Engineers. Use it to seed a
 realistic, active view of the Today View in Slack before a customer demo — sending DMs on
-behalf of persona accounts (a CRO, a customer, a deal-desk partner, etc.) so
+behalf of persona accounts (a CRO, a manager, a deal-desk partner, etc.) so
 the environment looks naturally active, with pending messages from other users. When the demo is
 over, clean up all the seeded messages in one step.
 
