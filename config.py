@@ -62,7 +62,7 @@ def user_client(email: str) -> WebClient:
     if not token:
         raise RuntimeError(
             f"No user token for {email!r} in tokens.json. "
-            f"Run `python auth_user.py --email {email}` first."
+            f"Run `.venv/bin/python -u auth_user.py --email {email}` first."
         )
     return WebClient(token=token)
 

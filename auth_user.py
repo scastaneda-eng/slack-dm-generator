@@ -1,7 +1,7 @@
 """One-time OAuth flow to capture a user's xoxp- token.
 
 Usage:
-    python -u auth_user.py --email persona@yourorg.com
+    .venv/bin/python -u auth_user.py --email persona@yourorg.com
 
 The `-u` flag (unbuffered) ensures the OAuth URL prints before the script
 blocks on the local callback server — important when you need to copy the
@@ -226,7 +226,7 @@ def main() -> int:
             "or env vars SLACK_CLIENT_ID / SLACK_CLIENT_SECRET.",
             file=sys.stderr,
         )
-        print("Copy these from your Slack app's Basic Information page (see SETUP.md, Step 3).", file=sys.stderr)
+        print("Copy these from your Slack app's Basic Information page (see SETUP.md, Step 2).", file=sys.stderr)
         return 1
 
     state = secrets.token_urlsafe(16)

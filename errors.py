@@ -17,7 +17,12 @@ _FRIENDLY = {
     "channel_not_found": "DM channel not found. The recipient may have been deleted, or the channel ID is stale.",
     "cant_dm_bot": "Personas can't DM bots. Pick a human recipient.",
     "message_not_found": "The target message no longer exists (already deleted, or the timestamp is wrong).",
-    "missing_scope": "The token is missing a scope. Check manifest.json and reinstall the app.",
+    "missing_scope": (
+        "The token is missing a scope. Update the bot/user scopes in manifest.json, "
+        "then paste the updated manifest at api.slack.com → your app → Features → "
+        "App Manifest → Save Changes, and reinstall the app from "
+        "Settings → Install App."
+    ),
     "not_authed": "No token sent. Likely a bug in token loading — check tokens.json.",
     "no_permission": "Token has scopes but Slack denied this specific action (org-level restrictions).",
 }

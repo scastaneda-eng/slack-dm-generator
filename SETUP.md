@@ -106,9 +106,15 @@ directly instead of activating.
    **OAuth & Permissions** and copy the **Bot User OAuth Token** (starts with
    `xoxb-`). Keep it handy — you'll use it in Step 8.
 
-> ℹ The manifest already configured `https://localhost:3000/oauth/callback` as
-> the redirect URL, added the `chat:write` user scope (covers DM **send** and
-> **delete**), and added the bot scopes needed for optional audit logging.
+> ℹ The manifest already configured `https://localhost:3000/oauth/callback`
+> as the redirect URL and pre-loaded the scopes the toolkit needs:
+>
+> - **User scope** (used for the persona's `xoxp-` token):
+>   `chat:write` — covers DM **send** and **delete**.
+> - **Bot scopes** (used for the optional audit-logging `xoxb-` token in
+>   Step 8): `chat:write`, `chat:write.public`, `users:read`,
+>   `users:read.email`.
+>
 > Nothing to click there.
 
 ---
@@ -226,7 +232,7 @@ After you authorize, the script:
 > can pass for the wrong user when usernames diverge from emails (e.g.
 > an admin account that happens to substring-match). **Strongly
 > recommended: configure `app_token`** (a Slack bot token with the
-> `users:read.email` scope) so the script can call
+> `users:read` and `users:read.email` scopes) so the script can call
 > `users.lookupByEmail` and verify exactly. Heuristic-mode runs print a
 > visible warning before saving.
 

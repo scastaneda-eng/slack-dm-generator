@@ -1,5 +1,5 @@
 {
-  "_comment": "Copy this file (e.g. to send_messages.json), edit the values, then: python examples/send_dms_as_users.py --config send_messages.json --manifest sent.json",
+  "_comment": "Copy this file (e.g. to send_messages.json), edit the values, then: .venv/bin/python examples/send_dms_as_users.py --config send_messages.json --manifest sent.json",
   "messages": [
     {
       "sender_email": "boss@yourorg.com",

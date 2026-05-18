@@ -68,7 +68,7 @@ def main() -> int:
     users = tokens.get("users") or {}
     real_users = {k: v for k, v in users.items() if not k.startswith("_") and isinstance(v, str) and v}
     if not real_users:
-        print("  (none captured yet — run `python -u auth_user.py --email <email>`)")
+        print("  (none captured yet — run `.venv/bin/python -u auth_user.py --email <email>`)")
     for email, token in real_users.items():
         try:
             r = WebClient(token=token).auth_test()

@@ -30,11 +30,11 @@ how to install and implement this project.
   doc is Mac-first; for Windows users, substitute from the
   `## Windows commands` table at the bottom of `SETUP.md` whenever a command
   starts with `source`, `cp`, or `python3.12`. Everything else is identical.
-- **After token capture** — always run `python verify_setup.py` and read the
-  output before declaring setup done.
+- **After token capture** — always run `.venv/bin/python verify_setup.py`
+  and read the output before declaring setup done.
 - **Sending DMs** — copy `examples/send_messages.example.json` to a new file,
   edit it for the user's demo, then run
-  `python examples/send_dms_as_users.py --config <file> --manifest sent.json`.
+  `.venv/bin/python examples/send_dms_as_users.py --config <file> --manifest sent.json`.
   Keep the manifest — it's how `delete_dms.py` knows what to remove later.
 
 ## What you must NOT do
@@ -59,7 +59,7 @@ persona. Incognito shortcut: `Cmd+Shift+N` (Chrome/Edge on Mac),
 `Cmd+Shift+P` (Firefox).
 
 **When running `auth_user.py` from a Claude Code session yourself, always
-pass `--no-open`** (`python -u auth_user.py --email <email> --no-open`).
+pass `--no-open`** (`.venv/bin/python -u auth_user.py --email <email> --no-open`).
 That suppresses the default-browser auto-open so only the URL prints in
 chat — the user copies it into incognito intentionally, and there's no
 risk of an extra browser tab silently authorizing the wrong account.
@@ -79,7 +79,7 @@ If the user needs to rotate tokens:
    `manifest.json` — if the user ever needs to change scopes, tell them to
    go to **Features → App Manifest** in the Slack app UI and paste an
    updated `manifest.json`, then reinstall.
-2. For the bot token: `python save_bot_token.py` (getpass).
-3. For user tokens: re-run `auth_user.py --email <email>` per persona.
+2. For the bot token: `.venv/bin/python save_bot_token.py` (getpass).
+3. For user tokens: re-run `.venv/bin/python -u auth_user.py --email <email>` per persona.
 4. Reinstalling the app does NOT invalidate already-captured `xoxp-` tokens,
    so you usually only need to re-capture the bot token.

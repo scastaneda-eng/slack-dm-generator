@@ -24,8 +24,8 @@ and the real target. See `delete_dms.py` for the implementation.
 ```bash
 # 1. Write a JSON file describing what to send (see send_messages.example.json)
 # 2. Send:
-python examples/send_dms_as_users.py --config send_messages.json --manifest sent.json
+.venv/bin/python examples/send_dms_as_users.py --config send_messages.json --manifest sent.json
 
 # 3. Later, to delete:
-python examples/delete_dms.py --manifest sent.json
+.venv/bin/python examples/delete_dms.py --manifest sent.json
 ```
