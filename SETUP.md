@@ -93,7 +93,34 @@ directly instead of activating.
 
 ---
 
+## Identities at a glance — read this before Step 2
+
+You'll work with two Slack identities through the rest of this setup. Knowing
+which one you're "being" at each step is the single biggest source of confusion
+for first-time users — pin this down up front and the rest of the setup is
+straightforward.
+
+> 👤 **Jennifer Hynes** (or your primary demo persona, if your demo org has
+> been customized — uncommon). In every Slack Demo Org, Jennifer is both the
+> admin *and* the primary demo user whose Today View / inbox is the focus of
+> the demo. **In your normal browser, sign into Slack as Jennifer before you
+> do Step 2.** Her account has the install rights this app needs, and her
+> inbox is the one the persona DMs will eventually land in.
+>
+> 🎭 **Personas** — fake users (CRO, customer, deal-desk, etc.) whose tokens
+> the script captures in Step 5 so they can DM Jennifer. **Each persona is
+> authorized in its own fresh incognito window**, one at a time.
+>
+> Quick rule of thumb: *normal browser = Jennifer, incognito window = persona.*
+
+---
+
 ## Step 2 — `[Slack web UI]` Install the app and copy OAuth credentials
+
+> 👤 Before you click **Install to Workspace**: in this same (normal,
+> non-incognito) browser, sign into Slack as **Jennifer Hynes** (or your
+> primary demo persona). She has the install rights this app needs, and her
+> inbox is the one the persona DMs will land in.
 
 1. On your app's page at api.slack.com, click **Install to Workspace** and
    review the permissions, then click **Allow**.
@@ -168,75 +195,80 @@ tokens.)
 (The script prints a URL, then waits for your browser to complete OAuth.
 You need to watch it live and have the window stay open.)
 
-For each user you want to impersonate (e.g., a CRO persona, a customer
-persona, a deal-desk persona):
+This is the step where you switch identities: in Step 2 you were Jennifer
+in your normal browser; now, **for each persona you want to impersonate**
+(CRO, customer, deal-desk, etc.), you'll log in as that persona in a fresh
+incognito window and let the script capture an `xoxp-` token through Slack's
+OAuth flow. Quick rule of thumb: *normal browser = Jennifer, incognito
+window = persona.*
 
-```bash
-.venv/bin/python -u auth_user.py --email persona@yourorg.com
-```
+Repeat the checklist below once per persona.
 
-> ⚠ Use `-u` (unbuffered) so the OAuth URL prints **before** the
-> script blocks waiting for the callback.
+### The flow, step by step
 
-> 🛑 **Add `--no-open` if you're running this via Claude Code** (or any time
-> your default browser is signed into Slack as someone other than the target
-> persona):
->
-> ```bash
-> .venv/bin/python -u auth_user.py --email persona@yourorg.com --no-open
-> ```
->
-> Without `--no-open`, the script auto-opens your default browser on top of
-> the URL it prints. If that browser is logged into Slack as a different
-> account (very common — your admin account is usually open there), it's
-> easy to accidentally click "Allow" in the wrong window and authorize as
-> the wrong user. The verification step will catch and reject it, but
-> `--no-open` avoids the round trip entirely.
+1. **Open a fresh incognito window and sign into Slack as the persona.**
+   Use that persona's Demo Zone Magic Link. Keep the window open — you'll
+   paste a URL into it shortly.
+   - Incognito shortcut: `Cmd+Shift+N` (Chrome/Edge on Mac), `Ctrl+Shift+N`
+     (Chrome/Edge on Windows), `Cmd+Shift+P` / `Ctrl+Shift+P` (Firefox).
 
-> 🪄 **Before you run the script:** open an incognito/private browser
-> window and log in to Slack as the target persona using that persona's
-> Demo Zone Magic Link. Keep that window open — you'll paste the OAuth
-> URL into it in a moment.
->
-> Incognito shortcut: `Cmd+Shift+N` (Chrome/Edge on Mac),
-> `Ctrl+Shift+N` (Chrome/Edge on Windows), `Cmd+Shift+P` / `Ctrl+Shift+P`
-> (Firefox).
+2. **Run the script** (in your Terminal, not in Claude Code):
+   ```bash
+   .venv/bin/python -u auth_user.py --email persona@yourorg.com
+   ```
+   - The `-u` (unbuffered) flag makes the OAuth URL print **before** the
+     script blocks waiting for the callback.
+   - Add `--no-open` if you're running this through Claude Code, or any
+     time your default browser is signed into Slack as someone other than
+     the persona you're capturing:
+     ```bash
+     .venv/bin/python -u auth_user.py --email persona@yourorg.com --no-open
+     ```
+     Without it, the script auto-opens your default browser on top of the
+     URL it prints — easy to accidentally click "Allow" in the wrong
+     window. `--no-open` skips that round trip entirely.
 
-The script will print an OAuth URL. **STOP** — read this carefully:
+3. **Copy the OAuth URL the script prints, and paste it into the incognito
+   window from step 1** — *not* your default browser.
+   - **Why incognito matters:** Slack's OAuth URL is identity-blind. It
+     grants a token for whichever Slack user is signed into the browser
+     that loads it. Your normal browser is signed in as Jennifer, so a
+     URL loaded there would issue a Jennifer token. The incognito window
+     gives you a clean slate signed into Slack only as the persona, so
+     the token belongs to the persona.
+   - If the script auto-opened a tab in your default browser (i.e., you
+     didn't pass `--no-open`), **ignore that tab** — close it or just
+     don't click "Allow" in it.
+   - Your browser will warn about a self-signed cert on `localhost`. Click
+     **advanced → proceed**.
 
-> ⚠ **Paste the URL into the incognito window you just opened** (the one
-> logged in as the target persona). Do NOT use your default browser —
-> if you're signed in there as a different user (e.g., your admin
-> account), Slack will silently grant the wrong user's token.
+4. **Click Allow on Slack's authorization page** (in the incognito window).
+   The script captures the token, verifies it belongs to the persona, and
+   either saves it to `tokens.json` or rejects it.
 
-> ℹ The script also tries to open your default browser as a convenience —
-> ignore that tab if it goes to the wrong account.
+5. **If verification rejects:** the script will print a checklist of the
+   most likely causes. Fix the cause in the incognito window (or the
+   `--email` value) and re-run from step 1.
 
-> ℹ Your browser will warn about the self-signed cert. Click
-> **advanced → proceed** to continue.
+### Reference
 
-After you authorize, the script:
-1. Captures the `xoxp-` token from the OAuth callback.
-2. Calls `auth.test` on the new token to find out which user it actually
-   belongs to.
-3. (If `app_token` is configured) calls `users.lookupByEmail(email)` to get
-   the user ID for the email you passed.
-4. **Refuses to save** if those don't match — and tells you to retry in
-   incognito.
-
-> ⚠️ **Strict vs. heuristic verification.** Without `app_token` in
+> ⚠ **Strict vs. heuristic verification.** Without `app_token` in
 > `tokens.json`, the script can only *heuristically* check that the
 > captured token belongs to the right person — by comparing the email's
-> local part to the Slack username. That works for usernames that
-> follow your email scheme (e.g. `john.doe@co.com` ↔ `john.doe`) but
-> can pass for the wrong user when usernames diverge from emails (e.g.
-> an admin account that happens to substring-match). **Strongly
-> recommended: configure `app_token`** (a Slack bot token with the
-> `users:read` and `users:read.email` scopes) so the script can call
-> `users.lookupByEmail` and verify exactly. Heuristic-mode runs print a
-> visible warning before saving.
+> local part to the Slack username. That works for usernames that follow
+> your email scheme (e.g. `john.doe@co.com` ↔ `john.doe`) but can pass for
+> the wrong user when usernames diverge from emails (e.g. an admin account
+> that happens to substring-match). **Strongly recommended: configure
+> `app_token`** (a Slack bot token with the `users:read` and
+> `users:read.email` scopes) so the script can call `users.lookupByEmail`
+> and verify exactly. Heuristic-mode runs print a visible warning before
+> saving.
 
-Repeat for every persona.
+> ℹ **What just happened.** In Step 2 you installed the app once as
+> Jennifer (your normal browser, signed into Slack as her). In Step 5 you
+> switched to each persona in incognito and captured a per-user `xoxp-`
+> token. Those tokens now live in `tokens.json` under `users` and are what
+> let the toolkit DM Jennifer on each persona's behalf in Step 7.
 
 ---
 

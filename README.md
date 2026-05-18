@@ -6,8 +6,11 @@ behalf of persona accounts (a CRO, a customer, a deal-desk partner, etc.) so
 the environment looks naturally active, with pending messages from other users. When the demo is
 over, clean up all the seeded messages in one step.
 
-This app walks you through authorizing one or more demo personas so you can
-send messages on their behalf — all via API calls through your AI coding agent.
+This app walks you through (1) installing an OAuth integration once as
+Jennifer Hynes (or your primary demo persona, if you've swapped her out — uncommon),
+and then (2) authorizing it as each persona you want to impersonate, capturing
+per-user tokens so you can send messages on their behalf — all via API calls
+through your AI coding agent.
 
 > **New to Vibe Coding or Terminal commands?** No problem. You can ask your
 > agent for clarification or step-by-step instructions at any point. This

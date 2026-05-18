@@ -1,5 +1,5 @@
 {
-  "_comment": "Copy this file (e.g. to send_messages.json), edit the values, then: .venv/bin/python examples/send_dms_as_users.py --config send_messages.json --manifest sent.json",
+  "_comment": "Copy this file (e.g. to send_messages.json), edit the values, then: .venv/bin/python examples/send_dms_as_users.py --config send_messages.json --manifest sent.json. Each sender_email MUST be a persona you authorized in Step 5 (look at the keys under 'users' in tokens.json to see which personas are available). recipient_user_id is the Slack user ID (starts with U) of the person who should RECEIVE the DM — usually Jennifer Hynes (or your primary demo persona).",
   "messages": [
     {
       "sender_email": "boss@yourorg.com",
