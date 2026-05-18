@@ -27,7 +27,14 @@ from cryptography.x509.oid import NameOID
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 
-from config import ROOT, audit_log, load_tokens, save_tokens
+from config import (
+    ROOT,
+    audit_log,
+    get_app_token,
+    get_oauth_config,
+    load_tokens,
+    save_tokens,
+)
 
 CERT_DIR = ROOT / ".certs"
 CERT_FILE = CERT_DIR / "localhost.pem"
@@ -86,6 +93,16 @@ class CallbackHandler(http.server.BaseHTTPRequestHandler):
         if parsed.path != "/oauth/callback":
             self.send_response(404)
             self.end_headers()
+            return
+        # Reject second-and-later callbacks. The state token is single-use; if
+        # something else on localhost replays it (stale browser tab, dev
+        # server, etc.), we don't want to silently overwrite the captured
+        # response.
+        if CallbackHandler.captured:
+            self.send_response(409)
+            self.send_header("Content-Type", "text/html")
+            self.end_headers()
+            self.wfile.write(b"<h2>Already received a callback.</h2>")
             return
         params = dict(urllib.parse.parse_qsl(parsed.query))
         CallbackHandler.captured.update(params)
@@ -199,12 +216,16 @@ def main() -> int:
     args = parser.parse_args()
 
     tokens = load_tokens()
-    oauth = tokens.get("oauth") or {}
-    client_id = oauth.get("client_id")
-    client_secret = oauth.get("client_secret")
-    redirect_uri = oauth.get("redirect_uri", "https://localhost:3000/oauth/callback")
+    oauth = get_oauth_config()
+    client_id = oauth["client_id"]
+    client_secret = oauth["client_secret"]
+    redirect_uri = oauth["redirect_uri"]
     if not client_id or not client_secret or "PASTE" in str(client_id) or "PASTE" in str(client_secret):
-        print("Missing or unset oauth.client_id / client_secret in tokens.json", file=sys.stderr)
+        print(
+            "Missing or unset OAuth credentials. Set via tokens.json[oauth] "
+            "or env vars SLACK_CLIENT_ID / SLACK_CLIENT_SECRET.",
+            file=sys.stderr,
+        )
         print("Copy these from your Slack app's Basic Information page (see SETUP.md, Step 3).", file=sys.stderr)
         return 1
 
@@ -247,7 +268,7 @@ def main() -> int:
         print(f"No user token in response: {result}", file=sys.stderr)
         return 1
 
-    ok, detail = verify_token_matches_email(user_token, args.email, tokens.get("app_token"))
+    ok, detail = verify_token_matches_email(user_token, args.email, get_app_token())
     if not ok:
         print()
         print("!" * 70)
@@ -255,6 +276,20 @@ def main() -> int:
         print("!" * 70)
         print(detail)
         return 2
+
+    is_heuristic = "heuristic" in detail.lower()
+    if is_heuristic:
+        print()
+        print("!" * 70)
+        print("WARNING: heuristic verification only.")
+        print("!" * 70)
+        print("Without app_token in tokens.json, we can only compare the email's")
+        print("local part to the Slack username — which can pass for the wrong")
+        print("user when usernames don't follow your email scheme. Strongly")
+        print("recommend setting app_token (a Slack bot/app token with")
+        print("users:read.email scope) so future runs can call")
+        print("users.lookupByEmail and verify exactly. See SETUP.md for details.")
+        print()
 
     tokens.setdefault("users", {})[args.email] = user_token
     save_tokens(tokens)

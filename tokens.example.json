@@ -1,5 +1,6 @@
 {
   "_comment": "Copy this file to tokens.json (which is gitignored) and fill in real values. See SETUP.md for where to find each one.",
+  "_env_vars_comment": "Any of these can be overridden by env vars instead of committing to tokens.json: SLACK_CLIENT_ID, SLACK_CLIENT_SECRET, SLACK_APP_TOKEN, SLACK_AUDIT_CHANNEL_ID. Useful for CI / secret-manager flows. Env vars win when both are set.",
   "oauth": {
     "client_id": "PASTE_FROM_SLACK_APP_BASIC_INFO_PAGE",
     "client_secret": "PASTE_FROM_SLACK_APP_BASIC_INFO_PAGE",

@@ -222,6 +222,18 @@ After you authorize, the script:
 4. **Refuses to save** if those don't match — and tells you to retry in
    incognito.
 
+> ⚠️ **Strict vs. heuristic verification.** Without `app_token` in
+> `tokens.json`, the script can only *heuristically* check that the
+> captured token belongs to the right person — by comparing the email's
+> local part to the Slack username. That works for usernames that
+> follow your email scheme (e.g. `john.doe@co.com` ↔ `john.doe`) but
+> can pass for the wrong user when usernames diverge from emails (e.g.
+> an admin account that happens to substring-match). **Strongly
+> recommended: configure `app_token`** (a Slack bot token with the
+> `users:read.email` scope) so the script can call
+> `users.lookupByEmail` and verify exactly. Heuristic-mode runs print a
+> visible warning before saving.
+
 Repeat for every persona.
 
 ---

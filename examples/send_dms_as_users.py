@@ -38,6 +38,10 @@ from retry import retry_on_rate_limit  # noqa: E402
 
 # Slack user IDs are uppercase alphanumeric, prefixed with U or W (workspace).
 USER_ID_RE = re.compile(r"^[UW][A-Z0-9]{8,}$")
+# Slack rejects messages over 40K chars but the API error is opaque; cap at
+# 5K with a friendly message — long demo prep DMs are rarely intentional and
+# usually a stray paste from the wrong source.
+MAX_TEXT_CHARS = 5000
 
 
 @retry_on_rate_limit()
@@ -46,6 +50,11 @@ def send_one(sender_email: str, recipient_user_id: str, text: str) -> dict:
         raise RuntimeError(
             f"recipient_user_id {recipient_user_id!r} doesn't look like a Slack user ID "
             f"(expected something like U01ABCDEFGH)"
+        )
+    if len(text) > MAX_TEXT_CHARS:
+        raise RuntimeError(
+            f"text is {len(text)} chars (limit {MAX_TEXT_CHARS}). Likely an "
+            f"unintended paste — trim the message in your config file."
         )
     client = user_client(sender_email)
     resp = client.chat_postMessage(channel=recipient_user_id, text=text)
