@@ -11,8 +11,7 @@ Setup is one-time, ~15 minutes.
 
 - **Read it yourself.** The steps below assume you're comfortable opening a
   Terminal window, copy-pasting commands, and running them yourself.
-- **Open this folder in [Claude Code](https://claude.com/claude-code) and
-  ask *"help me set this up."*** Claude reads this guide and
+- **Open this folder in Claude Code and ask *"help me set this up."*** Claude reads this guide and
   [CLAUDE.md](CLAUDE.md) and walks you through it one step at a time,
   pausing for your confirmation between steps and running the commands
   for you when it's safe to do so. Best if you're new to Terminal — at
