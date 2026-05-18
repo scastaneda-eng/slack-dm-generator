@@ -16,9 +16,19 @@ through your AI coding agent.
 > agent for clarification or step-by-step instructions at any point. This
 > project was built with beginner coders in mind.
 
-## Get started
+## Get started — pick one
 
-Read [SETUP.md](SETUP.md). Setup is ~15 minutes. You'll need:
+You can follow setup either way, whichever you're more comfortable with:
+
+- **Read [SETUP.md](SETUP.md) yourself.** Step-by-step instructions, ~15 minutes.
+- **Open this folder in [Claude Code](https://claude.com/claude-code) and ask
+  *"help me set this up."*** Claude reads [SETUP.md](SETUP.md) and
+  [CLAUDE.md](CLAUDE.md), then walks you through it one step at a time —
+  pausing for confirmation, running commands for you when safe, and handling
+  the gotchas (incognito for OAuth, never paste tokens in chat, what to do
+  if verification fails). Best for first-time Terminal users.
+
+Either way you'll need:
 - Admin access to your demo Slack org
 - Python 3.12
 - A willingness to click through one self-signed cert warning
@@ -31,8 +41,3 @@ Read [SETUP.md](SETUP.md). Setup is ~15 minutes. You'll need:
 > `zsh: command not found: python` (macOS only ships `python3`). Use the
 > `.venv/bin/python` form and you're fine.
 
-## Using Claude Code?
-
-Open this folder in Claude Code and ask: *"help me set this up."*
-[CLAUDE.md](CLAUDE.md) tells Claude how to handle the gotchas (incognito for
-OAuth, never paste tokens in chat, what to do if verification fails, etc.).
