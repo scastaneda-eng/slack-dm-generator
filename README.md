@@ -7,7 +7,7 @@ the environment looks naturally active, with pending messages from other users. 
 over, clean up all the seeded messages in one step.
 
 This app walks you through (1) installing an OAuth integration once as
-Jennifer Hynes (or your primary demo persona, if you've swapped her out — uncommon),
+Jennifer Hynes (or your primary demo persona, if you've swapped her out),
 and then (2) authorizing it as each persona you want to impersonate, capturing
 per-user tokens so you can send messages on their behalf — all via API calls
 through your AI coding agent.
