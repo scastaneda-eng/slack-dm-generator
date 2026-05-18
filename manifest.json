@@ -21,6 +21,7 @@
       "bot": [
         "chat:write",
         "chat:write.public",
+        "users:read",
         "users:read.email"
       ]
     }

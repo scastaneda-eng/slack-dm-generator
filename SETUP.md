@@ -292,7 +292,7 @@ If you want every send/delete logged automatically to a Slack channel:
 If you don't do this, audit logging silently no-ops. The toolkit still works.
 
 > ℹ The manifest already ships the bot scopes this feature needs
-> (`chat:write`, `chat:write.public`, `users:read.email`), so there's no
+> (`chat:write`, `chat:write.public`, `users:read`, `users:read.email`), so there's no
 > reinstall step — just run `save_bot_token.py` with the token that was
 > generated when you installed the app in Step 2.
 
