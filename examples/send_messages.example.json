@@ -7,9 +7,9 @@
       "text": "Quick one — where do we land on the Acme renewal? Need a best/most-likely for the Q2 board readout by EOD tomorrow."
     },
     {
-      "sender_email": "customer@yourorg.com",
+      "sender_email": "dealdesk@yourorg.com",
       "recipient_user_id": "U01ABCDEFGH",
-      "text": "Hi — following up on the proposal you sent last week. Any chance you have 20 min this week to walk through it?"
+      "text": "Got your discount request for Acme — need exec approval on anything past 18%. Can you grab a quick justification before I route it?"
     }
   ]
 }

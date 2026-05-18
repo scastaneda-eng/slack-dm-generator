@@ -107,7 +107,7 @@ straightforward.
 > do Step 2.** Her account has the install rights this app needs, and her
 > inbox is the one the persona DMs will eventually land in.
 >
-> 🎭 **Personas** — fake users (CRO, customer, deal-desk, etc.) whose tokens
+> 🎭 **Personas** — fake users (CRO, manager, deal-desk, etc.) whose tokens
 > the script captures in Step 5 so they can DM Jennifer. **Each persona is
 > authorized in its own fresh incognito window**, one at a time.
 >
@@ -197,7 +197,7 @@ You need to watch it live and have the window stay open.)
 
 This is the step where you switch identities: in Step 2 you were Jennifer
 in your normal browser; now, **for each persona you want to impersonate**
-(CRO, customer, deal-desk, etc.), you'll log in as that persona in a fresh
+(CRO, manager, deal-desk, etc.), you'll log in as that persona in a fresh
 incognito window and let the script capture an `xoxp-` token through Slack's
 OAuth flow. Quick rule of thumb: *normal browser = Jennifer, incognito
 window = persona.*
