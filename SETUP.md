@@ -121,22 +121,18 @@ If you're using Terminal instead, run them there — just make sure you've
 
 ```bash
 python3.12 -m venv .venv
-pip install -r requirements.txt
+.venv/bin/pip install -r requirements.txt
 ```
 
 You'll see a new `.venv/` folder appear in the project — that's the
 sandboxed Python install. It's gitignored, so it won't be committed.
 
-**If you're working in a dedicated Terminal window (not Claude Code),**
-also run this once per new Terminal window, so your shell uses the sandbox:
-
-```bash
-source .venv/bin/activate
-```
-
-You'll know it worked when your prompt gains a `(.venv)` prefix. You do
-**not** need to run `source ...` inside Claude Code — Claude calls
-`.venv/bin/python` directly.
+> ℹ **No activation needed.** Every command in the rest of this guide calls
+> `.venv/bin/python ...` directly, which uses the sandbox without any
+> activation step. This works the same in Claude Code and in a fresh
+> Terminal window. (If you prefer a shorter `python` command for your own
+> exploration, you can optionally run `source .venv/bin/activate` — it
+> lasts for the current Terminal window only.)
 
 ---
 
@@ -170,10 +166,10 @@ For each user you want to impersonate (e.g., a CRO persona, a customer
 persona, a deal-desk persona):
 
 ```bash
-python -u auth_user.py --email persona@yourorg.com
+.venv/bin/python -u auth_user.py --email persona@yourorg.com
 ```
 
-> ⚠ Use `python -u` (unbuffered) so the OAuth URL prints **before** the
+> ⚠ Use `-u` (unbuffered) so the OAuth URL prints **before** the
 > script blocks waiting for the callback.
 
 > 🛑 **Add `--no-open` if you're running this via Claude Code** (or any time
@@ -181,7 +177,7 @@ python -u auth_user.py --email persona@yourorg.com
 > persona):
 >
 > ```bash
-> python -u auth_user.py --email persona@yourorg.com --no-open
+> .venv/bin/python -u auth_user.py --email persona@yourorg.com --no-open
 > ```
 >
 > Without `--no-open`, the script auto-opens your default browser on top of
@@ -243,7 +239,7 @@ Repeat for every persona.
 **[Claude Code]** (or Terminal, either works):
 
 ```bash
-python verify_setup.py
+.venv/bin/python verify_setup.py
 ```
 
 Should print every persona email + matching user ID and end with
@@ -266,13 +262,13 @@ In Claude Code, Claude can run this and read the output back to you.
    edit the file for you.
 3. Send:
    ```bash
-   python examples/send_dms_as_users.py --config my_demo.json --manifest sent.json
+   .venv/bin/python examples/send_dms_as_users.py --config my_demo.json --manifest sent.json
    ```
 4. Confirm the DM appears in the recipient's Slack.
 
 To clean up:
 ```bash
-python examples/delete_dms.py --manifest sent.json
+.venv/bin/python examples/delete_dms.py --manifest sent.json
 ```
 
 ---
@@ -288,7 +284,7 @@ If you want every send/delete logged automatically to a Slack channel:
    uses a hidden paste prompt and a `y/N` confirm, which Claude Code's
    runner can't drive):
    ```bash
-   python save_bot_token.py
+   .venv/bin/python save_bot_token.py
    ```
    Paste the `xoxb-` token you copied in Step 2. **Your keystrokes won't
    appear on screen — that's intentional (`getpass` hides them so tokens
@@ -298,8 +294,8 @@ If you want every send/delete logged automatically to a Slack channel:
    > Token** (`xoxb-...`) and return here.
 3. Open `tokens.json` and set `audit_channel_id` to the channel ID from
    step 1.
-4. **[Claude Code]** Re-run `python verify_setup.py` — you should now see
-   audit logging green.
+4. **[Claude Code]** Re-run `.venv/bin/python verify_setup.py` — you should
+   now see audit logging green.
 
 If you don't do this, audit logging silently no-ops. The toolkit still works.
 
@@ -317,8 +313,8 @@ If you need to rotate (e.g., a token leaked):
 | Token | How to rotate |
 |---|---|
 | `client_secret` | Slack app → Basic Information → Regenerate. Update `tokens.json`. |
-| Bot `xoxb-` (audit) | Reinstall app → copy new token → `python save_bot_token.py`. |
-| Persona `xoxp-` | Re-run `python -u auth_user.py --email persona@yourorg.com`. |
+| Bot `xoxb-` (audit) | Reinstall app → copy new token → `.venv/bin/python save_bot_token.py`. |
+| Persona `xoxp-` | Re-run `.venv/bin/python -u auth_user.py --email persona@yourorg.com`. |
 
 Reinstalling the app does **not** invalidate existing user (`xoxp-`) tokens.
 
@@ -355,7 +351,14 @@ authorized in a browser logged in as the wrong user. Re-run in incognito as
 the target persona.
 
 **`auth_user.py` blocks before printing the URL** — You forgot the `-u`
-flag. Hit `Ctrl+C` and re-run as `python -u auth_user.py ...`.
+flag. Hit `Ctrl+C` and re-run as `.venv/bin/python -u auth_user.py ...`.
+
+**`zsh: command not found: python`** (or `python: command not found`) —
+You're in a Terminal window where the venv isn't active, and macOS's
+default Python is named `python3` (not `python`). The fix is already baked
+into every command in this guide: use the explicit
+`.venv/bin/python ...` form (or `.venv\Scripts\python.exe ...` on
+Windows). That works whether or not you've activated the venv.
 
 **`chat.delete` returns `cant_delete_message`** — User tokens can only
 delete their own messages. Make sure the `sender_email` in the manifest
@@ -387,15 +390,19 @@ replace `python` with `py` and `python3.12` with `py -3.12`.
 
 Windows users: Steps 1–2 are in the Slack web UI and work as written.
 Everything from Step 3 onward runs in **PowerShell** (search "PowerShell" in
-the Start menu). Only the commands in this table differ from the main flow
-above — anything that starts with `python` (e.g.,
-`python -u auth_user.py ...`, `python verify_setup.py`,
-`python examples/send_dms_as_users.py ...`) runs identically.
+the Start menu). The commands are nearly identical, with two substitutions:
+
+- Anywhere this guide writes `.venv/bin/python ...`, swap in
+  `.venv\Scripts\python.exe ...` (forward → back slashes, plus `.exe`).
+- Anywhere this guide writes `.venv/bin/pip ...`, swap in
+  `.venv\Scripts\pip.exe ...`.
+
+The remaining differences are in this table:
 
 | Step | Mac/Linux (main flow) | Windows (PowerShell) |
 |---|---|---|
 | 3 — create venv | `python3.12 -m venv .venv` | `py -3.12 -m venv .venv` |
-| 3 — activate venv | `source .venv/bin/activate` | `.venv\Scripts\Activate.ps1` |
+| 3 — install requirements | `.venv/bin/pip install -r requirements.txt` | `.venv\Scripts\pip.exe install -r requirements.txt` |
 | 4 — copy tokens file | `cp tokens.example.json tokens.json` | `Copy-Item tokens.example.json tokens.json` |
 | 7 — copy example config | `cp examples/send_messages.example.json my_demo.json` | `Copy-Item examples\send_messages.example.json my_demo.json` |
 
