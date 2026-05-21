@@ -40,3 +40,15 @@ Either way you'll need:
 > `zsh: command not found: python` (macOS only ships `python3`). Use the
 > `.venv/bin/python` form and you're fine.
 
+## Optional: keep your demo org alive automatically
+
+The [`daily/`](daily/README.md) folder is an opt-in add-on that uses GitHub
+Actions to send a small batch of generic DMs every weekday morning and noon,
+then wipe them at night — so your demo org stays naturally active between
+demos. It ships **disabled by default**: nothing runs until you turn it on.
+
+See [`daily/README.md`](daily/README.md) for setup (~10 minutes, requires a
+free GitHub account). **You'll create a *private* copy of this repo** for the
+add-on — the bot writes a small daily manifest containing persona emails and
+recipient IDs back to the repo, which you don't want public.
+

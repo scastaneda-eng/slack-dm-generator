@@ -1,0 +1,80 @@
+name: Daily DM Refresh
+
+# This workflow ships with a `.disabled` suffix so GitHub Actions ignores it.
+# To turn it on, rename to `daily-refresh.yml` and commit. See daily/README.md.
+
+on:
+  schedule:
+    # Hourly. refresh.py uses the recipient's timezone (from daily/config.json)
+    # to decide if the current hour matches a configured slot. This makes the
+    # job DST-safe without per-fork cron edits.
+    - cron: "0 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Manual run mode"
+        required: true
+        default: "auto"
+        type: choice
+        options:
+          - auto
+          - morning
+          - noon
+          - wipe
+
+permissions:
+  contents: write   # commit updated daily/state/today.json back to the fork
+
+concurrency:
+  group: daily-dm-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout fork
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore tokens.json from secret
+        env:
+          TOKENS_JSON: ${{ secrets.TOKENS_JSON }}
+        run: |
+          if [ -z "$TOKENS_JSON" ]; then
+            echo "::error::TOKENS_JSON secret is missing. See daily/README.md."
+            exit 1
+          fi
+          printf '%s' "$TOKENS_JSON" > tokens.json
+
+      - name: Ensure daily/config.json exists
+        run: |
+          if [ ! -f daily/config.json ]; then
+            echo "::error::daily/config.json not found. Copy daily/config.example.json and fill it in."
+            exit 1
+          fi
+
+      - name: Run refresh
+        run: |
+          python daily/refresh.py --mode "${{ github.event.inputs.mode || 'auto' }}"
+
+      - name: Commit updated manifest
+        run: |
+          git config user.name  "daily-dm-bot"
+          git config user.email "daily-dm-bot@users.noreply.github.com"
+          git add daily/state/today.json
+          if ! git diff --cached --quiet; then
+            git commit -m "daily-dm: state update [skip ci]"
+            git push
+          fi
+
+      - name: Wipe tokens.json from runner
+        if: always()
+        run: rm -f tokens.json

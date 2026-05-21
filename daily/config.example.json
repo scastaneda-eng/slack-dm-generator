@@ -1,0 +1,15 @@
+{
+  "_comment": "Copy to daily/config.json, then fill in the fields below. recipient_user_id is the Slack user ID (starts with U) of the person who should RECEIVE the DMs — usually Jennifer Hynes (or your primary demo persona). Each sender email MUST be a persona you authorized via auth_user.py — keys under 'users' in tokens.json. timezone is any IANA name (America/Los_Angeles, America/New_York, Europe/London, etc.). slots are HH:MM in 24h, recipient-local time. weekdays may be trimmed if you only want some days.",
+  "recipient_user_id": "U01ABCDEFGH",
+  "senders": {
+    "primary": "manager@yourorg.com",
+    "secondary": "teammate@yourorg.com"
+  },
+  "timezone": "America/Los_Angeles",
+  "slots": {
+    "morning": "08:00",
+    "noon":    "12:00",
+    "wipe":    "21:00"
+  },
+  "weekdays": ["monday", "tuesday", "wednesday", "thursday", "friday"]
+}

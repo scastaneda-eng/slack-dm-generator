@@ -1,0 +1,52 @@
+{
+  "monday": {
+    "morning": [
+      {"sender_role": "primary",   "text": "Need 15 minutes today to align on the retro outcomes before our 1:1 tomorrow. Does 2pm or 4pm work better?"},
+      {"sender_role": "secondary", "text": "Did the deck from Friday's review get finalized? I need to share it with my counterpart in the next hour."}
+    ],
+    "noon": [
+      {"sender_role": "primary",   "text": "Exec staff is asking for a one-pager on Q-priorities by EOD Wednesday. Can you pull a draft together? Send it my way before it goes up."},
+      {"sender_role": "secondary", "text": "Did legal come back on the contract review? It's blocking something I need to ship this week."}
+    ]
+  },
+  "tuesday": {
+    "morning": [
+      {"sender_role": "primary",   "text": "Saw the update from last night — solid. Before it goes to the broader team, can we get the numbers double-checked? I want to avoid a correction email."},
+      {"sender_role": "secondary", "text": "Can you send me the runbook link? On a customer call and need to walk them through the rollback steps."}
+    ],
+    "noon": [
+      {"sender_role": "primary",   "text": "Got pulled into a customer escalation this afternoon — can you cover the 3pm sync for me? I'll send a brief beforehand."},
+      {"sender_role": "secondary", "text": "How did you handle the migration last quarter? Hitting the same edge case and want to avoid redoing the work."}
+    ]
+  },
+  "wednesday": {
+    "morning": [
+      {"sender_role": "primary",   "text": "Mid-week check — anything you're stuck on or need cover for? Better to flag it now than Friday."},
+      {"sender_role": "secondary", "text": "Who owns approvals for vendor onboarding now? Need to route a request before EOD."}
+    ],
+    "noon": [
+      {"sender_role": "primary",   "text": "Putting together the QBR slides and want to feature your team's wins this quarter. Send me 2-3 bullets by EOD tomorrow."},
+      {"sender_role": "secondary", "text": "Need your review on the draft I just shared — especially the second half. Hoping to send it out tomorrow morning."}
+    ]
+  },
+  "thursday": {
+    "morning": [
+      {"sender_role": "primary",   "text": "FYI my calendar is packed the next two days. If anything customer-facing comes up, route it to me here and I'll triage between meetings."},
+      {"sender_role": "secondary", "text": "Did you get the dashboard query working? Hitting the same wall on mine and I need it for a review tomorrow."}
+    ],
+    "noon": [
+      {"sender_role": "primary",   "text": "Need your input on the priorities doc by EOD tomorrow. Comments in the doc are fine — don't need a write-up."},
+      {"sender_role": "secondary", "text": "Are you confirmed for the planning offsite next month? Need the final attendee list by Friday for the agenda."}
+    ]
+  },
+  "friday": {
+    "morning": [
+      {"sender_role": "primary",   "text": "Anything outstanding from this week I should flag in my update? Sending it up the chain at 3pm."},
+      {"sender_role": "secondary", "text": "Do you have a current copy of the rollout doc? The version in the drive is three months stale."}
+    ],
+    "noon": [
+      {"sender_role": "primary",   "text": "Building the team update now — send me 2-3 highlights from your week. Keeping it tight."},
+      {"sender_role": "secondary", "text": "Want to grab 15 min next week on the onboarding plan? I have specific questions on the first-90-days piece."}
+    ]
+  }
+}
