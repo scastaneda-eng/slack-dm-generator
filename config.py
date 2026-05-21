@@ -15,6 +15,8 @@ TOKENS_PATH = ROOT / "tokens.json"
 
 
 def load_tokens() -> dict[str, Any]:
+    if not TOKENS_PATH.exists():
+        return {}
     with TOKENS_PATH.open() as f:
         return json.load(f)
 
