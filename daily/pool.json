@@ -45,7 +45,7 @@
       {"sender_role": "secondary", "text": "Do you have a current copy of the rollout doc? The version in the drive is three months stale."}
     ],
     "noon": [
-      {"sender_role": "primary",   "text": "Building the team update now — send me 2-3 highlights from your week. Keeping it tight."},
+      {"sender_role": "primary",   "text": "Writing the Friday team update — reply with your top 2-3 wins or blockers from this week before 2pm so I can include them. Anything not in by then won't make the cut."},
       {"sender_role": "secondary", "text": "Want to grab 15 min next week on the onboarding plan? I have specific questions on the first-90-days piece."}
     ]
   }
