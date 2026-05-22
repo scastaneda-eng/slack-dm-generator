@@ -21,7 +21,7 @@
   },
   "wednesday": {
     "morning": [
-      {"sender_role": "primary",   "text": "Mid-week check — anything you're stuck on or need cover for? Better to flag it now than Friday."},
+      {"sender_role": "primary",   "text": "The project board hasn't been updated since Monday. Can you make sure your items reflect current status before the 1pm standup?"},
       {"sender_role": "secondary", "text": "Who owns approvals for vendor onboarding now? Need to route a request before EOD."}
     ],
     "noon": [
@@ -31,7 +31,7 @@
   },
   "thursday": {
     "morning": [
-      {"sender_role": "primary",   "text": "FYI my calendar is packed the next two days. If anything customer-facing comes up, route it to me here and I'll triage between meetings."},
+      {"sender_role": "primary",   "text": "One of your stakeholders flagged a concern about timeline. Can you reach out to them today and let me know what you hear? I want to address it before it escalates."},
       {"sender_role": "secondary", "text": "Did you get the dashboard query working? Hitting the same wall on mine and I need it for a review tomorrow."}
     ],
     "noon": [
