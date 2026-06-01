@@ -83,3 +83,46 @@ def test_cli_print_writes_plist_to_stdout(capsys: pytest.CaptureFixture[str]) ->
     assert "<plist" in captured.out
     assert "<key>Label</key>" in captured.out
     assert installer.LABEL in captured.out
+
+
+import json
+
+
+def test_validate_config_accepts_example(tmp_path: Path) -> None:
+    example = ROOT / "daily" / "config.example.json"
+    cfg = json.loads(example.read_text())
+    # Strip the leading "_comment" key that the example carries for SE guidance.
+    cfg.pop("_comment", None)
+    target = tmp_path / "config.json"
+    target.write_text(json.dumps(cfg))
+    # Should not raise.
+    parsed = installer.validate_config(target)
+    assert parsed["recipient_user_id"] == cfg["recipient_user_id"]
+
+
+def test_validate_config_rejects_missing_required_field(tmp_path: Path) -> None:
+    target = tmp_path / "config.json"
+    target.write_text(json.dumps({
+        "recipient_user_id": "U1",
+        "senders": {"primary": "p@x.com"},
+        "timezone": "America/Los_Angeles",
+        # missing slots and weekdays
+    }))
+    with pytest.raises(installer.ConfigError) as excinfo:
+        installer.validate_config(target)
+    assert "slots" in str(excinfo.value)
+
+
+def test_validate_config_rejects_bad_json(tmp_path: Path) -> None:
+    target = tmp_path / "config.json"
+    target.write_text("{not valid json")
+    with pytest.raises(installer.ConfigError) as excinfo:
+        installer.validate_config(target)
+    assert "JSON" in str(excinfo.value) or "json" in str(excinfo.value)
+
+
+def test_validate_config_rejects_missing_file(tmp_path: Path) -> None:
+    target = tmp_path / "missing.json"
+    with pytest.raises(installer.ConfigError) as excinfo:
+        installer.validate_config(target)
+    assert "not found" in str(excinfo.value)

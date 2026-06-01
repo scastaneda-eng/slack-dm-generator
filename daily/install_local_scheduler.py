@@ -64,6 +64,35 @@ def _render_for_repo(repo: Path) -> str:
     )
 
 
+import json
+
+REQUIRED_CONFIG_KEYS = ("recipient_user_id", "senders", "timezone", "slots", "weekdays")
+
+
+class ConfigError(Exception):
+    """Raised when daily/config.json is missing or malformed."""
+
+
+def validate_config(path: Path) -> dict:
+    """Load and validate daily/config.json. Raises ConfigError on any problem."""
+    if not path.exists():
+        raise ConfigError(
+            f"{path} not found. Copy daily/config.example.json to daily/config.json and fill it in."
+        )
+    try:
+        cfg = json.loads(path.read_text())
+    except json.JSONDecodeError as e:
+        raise ConfigError(f"{path} is not valid JSON: {e}") from e
+
+    missing = [k for k in REQUIRED_CONFIG_KEYS if k not in cfg]
+    if missing:
+        raise ConfigError(
+            f"{path} is missing required field(s): {', '.join(missing)}. "
+            f"See daily/config.example.json."
+        )
+    return cfg
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
