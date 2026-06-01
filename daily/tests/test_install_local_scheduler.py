@@ -181,3 +181,68 @@ def test_preflight_propagates_config_error(tmp_path: Path, monkeypatch: pytest.M
     monkeypatch.setattr(sys, "platform", "darwin")
     with pytest.raises(installer.ConfigError):
         installer.preflight(repo)
+
+
+import os
+import subprocess
+
+
+def test_install_writes_plist_and_calls_launchctl(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker,
+) -> None:
+    repo = _scaffold_repo(tmp_path)
+    monkeypatch.setattr(sys, "platform", "darwin")
+    fake_launch_agents = tmp_path / "LaunchAgents"
+    fake_launch_agents.mkdir()
+    monkeypatch.setattr(installer, "launch_agents_dir", lambda: fake_launch_agents)
+    monkeypatch.setattr(os, "getuid", lambda: 501)
+    run_mock = mocker.patch("subprocess.run", return_value=subprocess.CompletedProcess([], 0))
+
+    rc = installer.install(repo)
+    assert rc == 0
+
+    written = fake_launch_agents / "com.slack-dm-generator.daily.plist"
+    assert written.exists()
+    body = written.read_text()
+    assert str(repo / ".venv" / "bin" / "python") in body
+    assert installer.LABEL in body
+
+    run_mock.assert_called_once()
+    cmd = run_mock.call_args.args[0]
+    assert cmd[:2] == ["launchctl", "bootstrap"]
+    assert cmd[2] == "gui/501"
+    assert cmd[3] == str(written)
+
+
+def test_install_fails_when_preflight_fails(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker,
+) -> None:
+    repo = _scaffold_repo(tmp_path)
+    (repo / "tokens.json").unlink()
+    monkeypatch.setattr(sys, "platform", "darwin")
+    run_mock = mocker.patch("subprocess.run")
+
+    with pytest.raises(installer.PreflightError):
+        installer.install(repo)
+    run_mock.assert_not_called()
+
+
+def test_install_surfaces_launchctl_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker,
+) -> None:
+    repo = _scaffold_repo(tmp_path)
+    monkeypatch.setattr(sys, "platform", "darwin")
+    fake_launch_agents = tmp_path / "LaunchAgents"
+    fake_launch_agents.mkdir()
+    monkeypatch.setattr(installer, "launch_agents_dir", lambda: fake_launch_agents)
+    monkeypatch.setattr(os, "getuid", lambda: 501)
+    mocker.patch("subprocess.run", return_value=subprocess.CompletedProcess([], 5, stderr="boom"))
+
+    rc = installer.install(repo)
+    assert rc != 0

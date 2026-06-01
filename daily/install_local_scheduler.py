@@ -93,6 +93,48 @@ def validate_config(path: Path) -> dict:
     return cfg
 
 
+import os
+import subprocess
+
+
+def launch_agents_dir() -> Path:
+    """`~/Library/LaunchAgents`. Wrapped in a function so tests can monkeypatch."""
+    return Path.home() / "Library" / "LaunchAgents"
+
+
+def plist_path() -> Path:
+    return launch_agents_dir() / f"{LABEL}.plist"
+
+
+def install(repo: Path) -> int:
+    """Render plist, write to ~/Library/LaunchAgents/, bootstrap with launchctl."""
+    preflight(repo)
+    target = plist_path()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(_render_for_repo(repo))
+
+    result = subprocess.run(
+        ["launchctl", "bootstrap", f"gui/{os.getuid()}", str(target)],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        sys.stderr.write(
+            f"launchctl bootstrap failed (exit {result.returncode}): "
+            f"{result.stderr.strip()}\n"
+            f"The plist was written to {target} — fix the underlying issue and rerun.\n"
+        )
+        return result.returncode
+
+    print(f"Installed {LABEL}.")
+    print(f"  plist:  {target}")
+    print(f"  logs:   {stdout_log_path(repo)}")
+    print(f"          {stderr_log_path(repo)}")
+    print("Next run: at the top of the next hour. To smoke-test now:")
+    print(f"  {repo_python(repo)} {repo}/daily/refresh.py --mode morning")
+    return 0
+
+
 class PreflightError(Exception):
     """Raised when the local environment isn't ready for install."""
 
@@ -136,9 +178,16 @@ def main(argv: list[str] | None = None) -> int:
         sys.stdout.write(_render_for_repo(ROOT))
         return 0
 
-    # Install/uninstall/reinstall paths are added in later tasks.
-    parser.error("install/uninstall not yet implemented")
-    return 2  # unreachable; parser.error exits
+    if args.uninstall:
+        # Implemented in the next task.
+        parser.error("--uninstall not yet implemented")
+        return 2
+    if args.reinstall:
+        # Implemented in a later task.
+        parser.error("--reinstall not yet implemented")
+        return 2
+
+    return install(ROOT)
 
 
 if __name__ == "__main__":
