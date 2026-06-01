@@ -204,10 +204,17 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.uninstall:
         return uninstall()
-    if args.reinstall:
-        return reinstall(ROOT)
 
-    return install(ROOT)
+    # install and reinstall both run preflight, which raises PreflightError or
+    # ConfigError when the local environment isn't ready. Catch them here and
+    # print a clean one-line message instead of dumping a traceback at the SE.
+    try:
+        if args.reinstall:
+            return reinstall(ROOT)
+        return install(ROOT)
+    except (PreflightError, ConfigError) as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
 
 
 if __name__ == "__main__":

@@ -306,3 +306,43 @@ def test_reinstall_calls_uninstall_then_install(
     assert rc == 0
     uninstall_spy.assert_called_once()
     install_spy.assert_called_once()
+
+
+def test_cli_install_prints_friendly_error_on_preflight_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A failed preflight should print 'error: ...' to stderr and exit non-zero,
+    not dump a Python traceback at the SE."""
+    repo = _scaffold_repo(tmp_path)
+    (repo / "tokens.json").unlink()  # trigger PreflightError
+    monkeypatch.setattr(sys, "platform", "darwin")
+    monkeypatch.setattr(installer, "ROOT", repo)
+
+    rc = installer.main([])
+    captured = capsys.readouterr()
+
+    assert rc != 0
+    assert "Traceback" not in captured.err
+    assert "error:" in captured.err
+    assert "tokens.json" in captured.err
+
+
+def test_cli_install_prints_friendly_error_on_config_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A ConfigError (bad/missing config.json) should also surface cleanly."""
+    repo = _scaffold_repo(tmp_path)
+    (repo / "daily" / "config.json").unlink()  # trigger ConfigError
+    monkeypatch.setattr(sys, "platform", "darwin")
+    monkeypatch.setattr(installer, "ROOT", repo)
+
+    rc = installer.main([])
+    captured = capsys.readouterr()
+
+    assert rc != 0
+    assert "Traceback" not in captured.err
+    assert "error:" in captured.err
