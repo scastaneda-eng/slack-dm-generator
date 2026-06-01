@@ -126,3 +126,58 @@ def test_validate_config_rejects_missing_file(tmp_path: Path) -> None:
     with pytest.raises(installer.ConfigError) as excinfo:
         installer.validate_config(target)
     assert "not found" in str(excinfo.value)
+
+
+def _scaffold_repo(tmp_path: Path) -> Path:
+    """Create a minimal repo-like structure for preflight to pass."""
+    repo = tmp_path / "repo"
+    (repo / ".venv" / "bin").mkdir(parents=True)
+    (repo / ".venv" / "bin" / "python").touch()
+    (repo / "daily").mkdir(parents=True)
+    (repo / "tokens.json").write_text("{}")
+    cfg_example = ROOT / "daily" / "config.example.json"
+    cfg = json.loads(cfg_example.read_text())
+    cfg.pop("_comment", None)
+    (repo / "daily" / "config.json").write_text(json.dumps(cfg))
+    return repo
+
+
+def test_preflight_passes_with_complete_setup(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    repo = _scaffold_repo(tmp_path)
+    monkeypatch.setattr(sys, "platform", "darwin")
+    # Should not raise.
+    installer.preflight(repo)
+
+
+def test_preflight_rejects_non_mac(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    repo = _scaffold_repo(tmp_path)
+    monkeypatch.setattr(sys, "platform", "linux")
+    with pytest.raises(installer.PreflightError) as excinfo:
+        installer.preflight(repo)
+    assert "macOS" in str(excinfo.value) or "Mac" in str(excinfo.value)
+
+
+def test_preflight_rejects_missing_tokens_json(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    repo = _scaffold_repo(tmp_path)
+    (repo / "tokens.json").unlink()
+    monkeypatch.setattr(sys, "platform", "darwin")
+    with pytest.raises(installer.PreflightError) as excinfo:
+        installer.preflight(repo)
+    assert "tokens.json" in str(excinfo.value)
+
+
+def test_preflight_rejects_missing_venv(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    repo = _scaffold_repo(tmp_path)
+    (repo / ".venv" / "bin" / "python").unlink()
+    monkeypatch.setattr(sys, "platform", "darwin")
+    with pytest.raises(installer.PreflightError) as excinfo:
+        installer.preflight(repo)
+    assert ".venv" in str(excinfo.value)
+
+
+def test_preflight_propagates_config_error(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    repo = _scaffold_repo(tmp_path)
+    (repo / "daily" / "config.json").unlink()
+    monkeypatch.setattr(sys, "platform", "darwin")
+    with pytest.raises(installer.ConfigError):
+        installer.preflight(repo)

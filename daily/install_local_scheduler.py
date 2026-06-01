@@ -93,6 +93,34 @@ def validate_config(path: Path) -> dict:
     return cfg
 
 
+class PreflightError(Exception):
+    """Raised when the local environment isn't ready for install."""
+
+
+def preflight(repo: Path) -> dict:
+    """Verify the local environment is ready to install the LaunchAgent.
+
+    Returns the parsed config on success. Raises PreflightError or ConfigError
+    on failure with a message suitable for direct printing to the SE.
+    """
+    if sys.platform != "darwin":
+        raise PreflightError(
+            "This installer is macOS-only. "
+            "Linux SEs: see the cron snippet in daily/README.md. "
+            "Windows SEs: see the Task Scheduler appendix in daily/README.md."
+        )
+    if not (repo / "tokens.json").exists():
+        raise PreflightError(
+            f"{repo / 'tokens.json'} not found. Finish the main SETUP.md flow first."
+        )
+    venv_python = repo_python(repo)
+    if not venv_python.exists():
+        raise PreflightError(
+            f"{venv_python} not found. Create the venv per SETUP.md Step 3."
+        )
+    return validate_config(repo / "daily" / "config.json")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     group = parser.add_mutually_exclusive_group()
