@@ -6,3 +6,4 @@ __pycache__/
 .venv/
 .certs/
 .pytest_cache/
+daily/logs/*.log
