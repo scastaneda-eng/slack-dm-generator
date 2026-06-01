@@ -42,13 +42,11 @@ Either way you'll need:
 
 ## Optional: keep your demo org alive automatically
 
-The [`daily/`](daily/README.md) folder is an opt-in add-on that uses GitHub
-Actions to send a small batch of generic DMs every weekday morning and noon,
-then wipe them at night — so your demo org stays naturally active between
-demos. It ships **disabled by default**: nothing runs until you turn it on.
+The [`daily/`](daily/README.md) folder is an opt-in add-on that runs on a
+local schedule (launchd on Mac, cron on Linux, Task Scheduler on Windows)
+to send a small batch of generic DMs every weekday morning and noon, then
+wipe them at night — so your demo org stays naturally active between demos.
+It ships **disabled by default**: nothing runs until you turn it on.
 
-See [`daily/README.md`](daily/README.md) for setup (~10 minutes, requires a
-free GitHub account). **You'll create a *private* copy of this repo** for the
-add-on — the bot writes a small daily manifest containing persona emails and
-recipient IDs back to the repo, which you don't want public.
+See [`daily/README.md`](daily/README.md) for setup (~5 minutes on Mac).
 

@@ -83,3 +83,17 @@ If the user needs to rotate tokens:
 3. For user tokens: re-run `.venv/bin/python -u auth_user.py --email <email>` per persona.
 4. Reinstalling the app does NOT invalidate already-captured `xoxp-` tokens,
    so you usually only need to re-capture the bot token.
+
+## Daily add-on (`daily/`)
+
+If the user wants to enable the optional `daily/` automation, walk them
+through `daily/README.md`. Two notes specific to that add-on:
+
+- **Don't write the launchd .plist by hand.** The repo ships
+  `daily/install_local_scheduler.py`, which generates the .plist from
+  `daily/config.json` and registers it with `launchctl`. Run that script
+  via the Bash tool — don't synthesize plist XML inline.
+- **Don't reinstall after JSON edits.** Routine edits to slot times or
+  weekdays in `daily/config.json` take effect on the next hourly run —
+  the script reads JSON every time. Only run `--reinstall` if the repo
+  moves on disk or the venv is rebuilt.
