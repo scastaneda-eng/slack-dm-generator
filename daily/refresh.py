@@ -38,7 +38,7 @@ DEFAULT_MANIFEST_PATH = ROOT / "state" / "today.json"
 
 WEEKDAYS = ["monday", "tuesday", "wednesday", "thursday", "friday",
             "saturday", "sunday"]
-SLOT_WINDOW_MINUTES = 10
+SLOT_WINDOW_MINUTES = 5
 TEXT_PREVIEW_CHARS = 80
 
 
