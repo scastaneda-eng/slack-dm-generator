@@ -284,3 +284,25 @@ def test_uninstall_is_idempotent_when_nothing_installed(
 
     rc = installer.uninstall()
     assert rc == 0  # idempotent: no plist + bootout said "not loaded" is success
+
+
+def test_reinstall_calls_uninstall_then_install(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker,
+) -> None:
+    repo = _scaffold_repo(tmp_path)
+    monkeypatch.setattr(sys, "platform", "darwin")
+    fake_launch_agents = tmp_path / "LaunchAgents"
+    fake_launch_agents.mkdir()
+    monkeypatch.setattr(installer, "launch_agents_dir", lambda: fake_launch_agents)
+    monkeypatch.setattr(os, "getuid", lambda: 501)
+    mocker.patch("subprocess.run", return_value=subprocess.CompletedProcess([], 0))
+
+    uninstall_spy = mocker.spy(installer, "uninstall")
+    install_spy = mocker.spy(installer, "install")
+
+    rc = installer.reinstall(repo)
+    assert rc == 0
+    uninstall_spy.assert_called_once()
+    install_spy.assert_called_once()

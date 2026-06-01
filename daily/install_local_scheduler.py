@@ -153,6 +153,12 @@ def uninstall() -> int:
     return 0
 
 
+def reinstall(repo: Path) -> int:
+    """Bootout + delete + bootstrap fresh."""
+    uninstall()
+    return install(repo)
+
+
 class PreflightError(Exception):
     """Raised when the local environment isn't ready for install."""
 
@@ -199,9 +205,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.uninstall:
         return uninstall()
     if args.reinstall:
-        # Implemented in a later task.
-        parser.error("--reinstall not yet implemented")
-        return 2
+        return reinstall(ROOT)
 
     return install(ROOT)
 
