@@ -74,3 +74,12 @@ def test_render_plist_passes_plutil_lint() -> None:
         text=True,
     )
     assert result.returncode == 0, f"plutil rejected the plist: {result.stdout}{result.stderr}"
+
+
+def test_cli_print_writes_plist_to_stdout(capsys: pytest.CaptureFixture[str]) -> None:
+    rc = installer.main(["--print"])
+    captured = capsys.readouterr()
+    assert rc == 0
+    assert "<plist" in captured.out
+    assert "<key>Label</key>" in captured.out
+    assert installer.LABEL in captured.out

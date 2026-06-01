@@ -35,3 +35,54 @@ def render_plist(
         stdout_log=str(stdout_log),
         stderr_log=str(stderr_log),
     )
+
+
+import argparse
+import sys
+
+
+def repo_python(repo: Path) -> Path:
+    """Absolute path to the venv python this repo expects to run with."""
+    return repo / ".venv" / "bin" / "python"
+
+
+def stdout_log_path(repo: Path) -> Path:
+    return repo / "daily" / "logs" / "stdout.log"
+
+
+def stderr_log_path(repo: Path) -> Path:
+    return repo / "daily" / "logs" / "stderr.log"
+
+
+def _render_for_repo(repo: Path) -> str:
+    return render_plist(
+        python=repo_python(repo),
+        repo=repo,
+        label=LABEL,
+        stdout_log=stdout_log_path(repo),
+        stderr_log=stderr_log_path(repo),
+    )
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--print", dest="print_only", action="store_true",
+                       help="Render the plist and write it to stdout. No filesystem changes.")
+    group.add_argument("--uninstall", action="store_true",
+                       help="Stop and remove the LaunchAgent.")
+    group.add_argument("--reinstall", action="store_true",
+                       help="Uninstall then install fresh. Use after the repo moves on disk.")
+    args = parser.parse_args(argv)
+
+    if args.print_only:
+        sys.stdout.write(_render_for_repo(ROOT))
+        return 0
+
+    # Install/uninstall/reinstall paths are added in later tasks.
+    parser.error("install/uninstall not yet implemented")
+    return 2  # unreachable; parser.error exits
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
