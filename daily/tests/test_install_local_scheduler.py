@@ -246,3 +246,41 @@ def test_install_surfaces_launchctl_failure(
 
     rc = installer.install(repo)
     assert rc != 0
+
+
+def test_uninstall_calls_bootout_and_deletes_plist(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker,
+) -> None:
+    fake_launch_agents = tmp_path / "LaunchAgents"
+    fake_launch_agents.mkdir()
+    plist = fake_launch_agents / f"{installer.LABEL}.plist"
+    plist.write_text("dummy")
+    monkeypatch.setattr(installer, "launch_agents_dir", lambda: fake_launch_agents)
+    monkeypatch.setattr(os, "getuid", lambda: 501)
+    run_mock = mocker.patch("subprocess.run", return_value=subprocess.CompletedProcess([], 0))
+
+    rc = installer.uninstall()
+    assert rc == 0
+
+    cmd = run_mock.call_args.args[0]
+    assert cmd[:2] == ["launchctl", "bootout"]
+    assert cmd[2] == f"gui/501/{installer.LABEL}"
+    assert not plist.exists()
+
+
+def test_uninstall_is_idempotent_when_nothing_installed(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    mocker,
+) -> None:
+    fake_launch_agents = tmp_path / "LaunchAgents"
+    fake_launch_agents.mkdir()
+    monkeypatch.setattr(installer, "launch_agents_dir", lambda: fake_launch_agents)
+    monkeypatch.setattr(os, "getuid", lambda: 501)
+    # bootout returns non-zero when nothing is loaded — that's fine.
+    mocker.patch("subprocess.run", return_value=subprocess.CompletedProcess([], 113, stderr="not loaded"))
+
+    rc = installer.uninstall()
+    assert rc == 0  # idempotent: no plist + bootout said "not loaded" is success

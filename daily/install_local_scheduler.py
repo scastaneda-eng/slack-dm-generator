@@ -135,6 +135,24 @@ def install(repo: Path) -> int:
     return 0
 
 
+def uninstall() -> int:
+    """Bootout the LaunchAgent and delete the plist. Idempotent."""
+    target = plist_path()
+    # bootout is best-effort: it returns non-zero if the agent isn't loaded,
+    # and we treat that as success.
+    subprocess.run(
+        ["launchctl", "bootout", f"gui/{os.getuid()}/{LABEL}"],
+        capture_output=True,
+        text=True,
+    )
+    if target.exists():
+        target.unlink()
+        print(f"Removed {target}.")
+    else:
+        print(f"No plist at {target} — nothing to remove.")
+    return 0
+
+
 class PreflightError(Exception):
     """Raised when the local environment isn't ready for install."""
 
@@ -179,9 +197,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.uninstall:
-        # Implemented in the next task.
-        parser.error("--uninstall not yet implemented")
-        return 2
+        return uninstall()
     if args.reinstall:
         # Implemented in a later task.
         parser.error("--reinstall not yet implemented")
