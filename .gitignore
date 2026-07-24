@@ -7,3 +7,8 @@ __pycache__/
 .certs/
 .pytest_cache/
 daily/logs/*.log
+
+# Slack CLI local state (may contain app IDs / tokens) — see optional CLI section in SETUP.md
+.slack/apps.json
+.slack/apps.dev.json
+.slack/cache/

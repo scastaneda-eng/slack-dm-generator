@@ -111,6 +111,72 @@ directly instead of activating.
 
 ---
 
+## Optional — manage this app with the Slack CLI
+
+Most people should skip this — the manual steps above are the simplest path,
+and the CLI does nothing for the per-persona token capture in Step 5, which
+is the real work here. Use this only if you're already comfortable in the
+terminal and want to manage the app's manifest from there.
+
+You do **not** need the Slack CLI for this toolkit. This is a convenience for
+people who'd rather create the app and manage its manifest from the terminal
+instead of the Slack web UI.
+
+**What the CLI does here:** creates the app and applies/updates its manifest
+without the browser.
+**What it does *not* do:** it will not hand you the Client ID / Client Secret
+(or the optional bot `xoxb-` token) — you still copy those from the Slack UI
+in Step 2 (and Step 8) below. It also does nothing for the per-persona
+`xoxp-` OAuth capture in Step 5 — that stays exactly as written.
+
+1. **Install the Slack CLI and sign in (one-time per machine).**
+   Install it from the official guide
+   (https://docs.slack.dev/tools/slack-cli/), then:
+   ```bash
+   slack login
+   ```
+
+2. **Make the CLI aware of this app's manifest (one-time in this folder).**
+   Create a one-line hook file so CLI manifest commands read the repo's
+   `manifest.json`:
+   ```bash
+   mkdir -p .slack
+   printf '{ "hooks": { "get-manifest": "cat manifest.json" } }\n' > .slack/hooks.json
+   ```
+
+3. **Bring the app under CLI management — pick one:**
+   - **You already created the app** in the steps above (most people): link it.
+     ```bash
+     slack app link --app <APP_ID> --team <TEAM_ID>
+     ```
+     `<APP_ID>` (starts with `A`) is on your app's **Basic Information** page;
+     `<TEAM_ID>` (starts with `T`) is your workspace ID. Linking
+     records those IDs in `.slack/` so `slack` commands target this app.
+   - **Starting fresh** (no app yet): preview then create + install from the
+     repo manifest.
+     ```bash
+     slack manifest info          # preview the manifest the CLI will apply
+     slack app install
+     ```
+     Read the new App ID any time with:
+     ```bash
+     jq -r '.default_team.app_id' .slack/apps.json
+     ```
+
+4. **Push later manifest edits** (only if you edited `manifest.json`):
+   ```bash
+   slack app install --update
+   ```
+
+5. **Return to Step 2** to copy your token — that part is unchanged.
+
+> The CLI does not print your bot/user token, and (for parity with the docs)
+> `slack app link` only records the App ID and Team ID; it does not fetch a
+> manifest. Which manifest "wins" is governed by the `manifest.source`
+> setting in `.slack/config.json`, not by linking.
+
+---
+
 ## Identities at a glance — read this before Step 2
 
 You'll work with two Slack identities through the rest of this setup. Knowing
