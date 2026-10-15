@@ -13,8 +13,11 @@ how to install and implement this project.
   moving on.
 - **Showing the manifest** — when the user hits Step 1 (the "paste the
   manifest into Slack" step), open `manifest.json` with the Read tool and
-  show the full JSON in chat so the user can copy it. The manifest is
-  fixed (pre-configured app name, scopes, redirect URL) — don't edit it.
+  show the full JSON in chat so the user can copy it. Don't improvise or
+  modify the manifest mid-walkthrough while helping someone through setup —
+  deliberate scope/config changes to `manifest.json` are the project owner's
+  call and go through the **Token rotation** process below, not an ad hoc
+  edit during a setup session.
 - **Respect the [Claude Code] vs [Terminal] tags in SETUP.md.** For
   `[Claude Code]` steps, just run the command yourself via the Bash tool
   and show the user the result. For `[Terminal]` steps, **don't run them

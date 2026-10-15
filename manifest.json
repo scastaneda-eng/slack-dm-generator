@@ -16,7 +16,8 @@
     ],
     "scopes": {
       "user": [
-        "chat:write"
+        "chat:write",
+        "reactions:write"
       ],
       "bot": [
         "chat:write",
