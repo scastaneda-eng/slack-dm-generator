@@ -41,7 +41,26 @@ CERT_FILE = CERT_DIR / "localhost.pem"
 KEY_FILE = CERT_DIR / "localhost.key"
 PORT = 3000
 
-USER_SCOPES = ["chat:write"]
+# Broad persona-token scope set so a single (incognito) re-auth pass covers
+# current needs + common demo-building actions, and you don't have to
+# re-capture every persona again just to add one scope later. All are USER
+# Token Scopes on the OAuth app (must also be enabled there).
+USER_SCOPES = [
+    # messaging
+    "chat:write",
+    # channels (public + private): manage, read, and read history/threads
+    "channels:read", "channels:write", "channels:history",
+    "groups:read", "groups:write", "groups:history",
+    # direct + group DMs: open and seed as the persona
+    "im:write", "im:read", "im:history",
+    "mpim:write", "mpim:history",
+    # reactions (react as the person; read to dedupe before adding)
+    "reactions:read", "reactions:write",
+    # attachments, pins, bookmarks, and name/ID lookup
+    "files:write", "pins:write", "bookmarks:write", "users:read",
+    # canvases authored by the persona
+    "canvases:read", "canvases:write",
+]
 
 
 def ensure_cert() -> None:

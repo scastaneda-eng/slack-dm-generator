@@ -17,7 +17,25 @@
     "scopes": {
       "user": [
         "chat:write",
-        "reactions:write"
+        "channels:read",
+        "channels:write",
+        "channels:history",
+        "groups:read",
+        "groups:write",
+        "groups:history",
+        "im:write",
+        "im:read",
+        "im:history",
+        "mpim:write",
+        "mpim:history",
+        "reactions:read",
+        "reactions:write",
+        "files:write",
+        "pins:write",
+        "bookmarks:write",
+        "users:read",
+        "canvases:read",
+        "canvases:write"
       ],
       "bot": [
         "chat:write",

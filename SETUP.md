@@ -220,13 +220,22 @@ straightforward.
 > ℹ The manifest already configured `https://localhost:3000/oauth/callback`
 > as the redirect URL and pre-loaded the scopes the toolkit needs:
 >
-> - **User scope** (used for the persona's `xoxp-` token):
->   `chat:write` — covers DM **send** and **delete**.
+> - **User scopes** (used for the persona's `xoxp-` token) — a broad set so
+>   one incognito re-auth pass covers DM send/delete plus common demo-building
+>   actions: `chat:write`, `channels:read/write/history`, `groups:read/write/
+>   history`, `im:write/read/history`, `mpim:write/history`,
+>   `reactions:read/write`, `files:write`, `pins:write`, `bookmarks:write`,
+>   `users:read`, `canvases:read/write`.
 > - **Bot scopes** (used for the optional audit-logging `xoxb-` token in
 >   Step 8): `chat:write`, `chat:write.public`, `users:read`,
 >   `users:read.email`.
 >
-> Nothing to click there.
+> Nothing to click there — unless your workspace is on **Enterprise Grid**
+> with org-level app approval turned on, in which case an org admin may need
+> to approve this scope list for the app once at
+> `app.slack.com/manage/<org_id>/integrations/profile/<app_id>/permissions`
+> before persona OAuth will succeed (error:
+> *"requesting more permissions than what your Org Admin has granted"*).
 
 ---
 
