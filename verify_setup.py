@@ -68,7 +68,8 @@ def main() -> int:
     users = tokens.get("users") or {}
     real_users = {k: v for k, v in users.items() if not k.startswith("_") and isinstance(v, str) and v}
     if not real_users:
-        print("  (none captured yet — run `.venv/bin/python -u auth_user.py --email <email>`)")
+        fail("Setup is incomplete. Authorize one demo sender in Step 5 of SETUP.md.")
+        failures += 1
     for email, token in real_users.items():
         try:
             r = WebClient(token=token).auth_test()
@@ -99,7 +100,7 @@ def main() -> int:
             ok(f"{email} -> {actual_id} ({actual_name}) [auth.test only — add app_token for strict verification]")
 
     if app_token:
-        print("\nChecking optional audit logging ...")
+        print("\nChecking the bot token and optional audit logging ...")
         try:
             r = WebClient(token=app_token).auth_test()
             ok(f"app_token valid (bot {r.get('user')} in team {r.get('team')})")
@@ -117,13 +118,16 @@ def main() -> int:
         else:
             print("  (audit_channel_id not set — audit_log() will silently no-op)")
     else:
-        print("\nAudit logging not configured (app_token unset). That's fine — it's optional.")
+        print("\nBot token absent. Exact sender verification and audit logging are unavailable.")
 
     print()
     if failures:
         print(f"FAIL — {failures} check(s) failed. Fix the items above before sending DMs.")
         return 1
-    print("READY — all checks passed.")
+    if app_token:
+        print("READY — sender accounts verified by email.")
+    else:
+        print("READY — sender tokens work. Sender identity was not verified by email.")
     return 0
 
 

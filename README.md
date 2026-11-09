@@ -1,52 +1,39 @@
-# slack-dm-generator
+# Slack DM Generator
 
-A demo preparation tool for Slack Solutions Engineers. Use it to seed a
-realistic, active view of the Today View in Slack before a customer demo — sending DMs on
-behalf of persona accounts (a CRO, a manager, a deal-desk partner, etc.) so
-the environment looks naturally active, with pending messages from other users. When the demo is
-over, clean up all the seeded messages in one step.
+Fill your Slack demo inbox with realistic direct messages (DMs) from demo
+accounts, then remove them after the demo. Start with one sender, one recipient,
+and one test DM. Check that it appears in Slack, then use the cleanup file to
+remove it. Once that works, you can prepare a batch for your demo.
 
-This app walks you through (1) installing an OAuth integration once as
-Jennifer Hynes (or your primary demo persona, if you've swapped her out),
-and then (2) authorizing it as each persona you want to impersonate, capturing
-per-user tokens so you can send messages on their behalf — all via API calls
-through your AI coding agent.
+## Before you start
 
-> **New to Vibe Coding or Terminal commands?** No problem. You can ask your
-> agent for clarification or step-by-step instructions at any point. This
-> project was built with beginner coders in mind.
+- A Slack demo workspace where you can install an app.
+- Sign-in access for the demo sender. Jennifer Hynes is the usual recipient.
+  Use your primary demo account if your workspace is customized.
+- Python 3.12. The [setup guide](SETUP.md#prerequisites) shows how to install it.
 
-## Get started — pick one
+On GitHub, choose **Code → Download ZIP** and unzip it, or clone the repo with
+Git. Open the resulting project folder in your coding assistant or Terminal.
 
-You can follow setup either way, whichever you're more comfortable with:
+## Pick your setup path
 
-- **Open this folder in Claude Code and ask *"help me set this up."*** Claude reads [SETUP.md](SETUP.md) and
-  [CLAUDE.md](CLAUDE.md), then walks you through it one step at a time —
-  pausing for confirmation, running commands for you when safe, and handling
-  the gotchas (incognito for OAuth, never paste tokens in chat, what to do
-  if verification fails). Best for first-time Terminal users.
-- **Read [SETUP.md](SETUP.md) yourself.** Step-by-step instructions, ~15 minutes.
+- **New to coding assistants or Terminal?** Paste the prompt below into your
+  coding assistant and ask for one step at a time.
+- **Comfortable with a coding assistant?** Use the same prompt and ask for a
+  short checklist. You'll sign into Slack and approve access in your browser.
+  Claude Code also uses [CLAUDE.md](CLAUDE.md) for project guidance.
+- **Prefer Terminal?** Follow the [setup guide](SETUP.md). Already set up?
+  [Verify setup](SETUP.md#step-6--verify) or
+  [send and clean up a test DM](SETUP.md#step-7--send-a-test-dm).
 
-Either way you'll need:
-- Admin access to your demo Slack org
-- Python 3.12
-- A willingness to click through one self-signed cert warning
+> Read SETUP.md and help me send and clean up one test DM in my Slack demo
+> workspace. Ask which operating system I use and whether I want step-by-step
+> help or a short checklist. Tell me what to click in Slack, what to run in
+> Terminal, and what success looks like. Show me the sender, recipient, and
+> message before sending.
 
-> ℹ **A note on Python commands.** Every command in SETUP.md calls
-> `.venv/bin/python ...` (or `.venv\Scripts\python.exe ...` on Windows)
-> directly — that's the local sandboxed Python created in Step 3. You do
-> **not** need to `source .venv/bin/activate` first. If you instead try
-> bare `python -u auth_user.py ...` in a fresh Mac terminal, you'll see
-> `zsh: command not found: python` (macOS only ships `python3`). Use the
-> `.venv/bin/python` form and you're fine.
+## Optional daily refresh
 
-## Optional: keep your demo org alive automatically
-
-The [`daily/`](daily/README.md) folder is an opt-in add-on that runs on a
-local schedule (launchd on Mac, cron on Linux, Task Scheduler on Windows)
-to send a small batch of generic DMs every weekday morning and noon, then
-wipe them at night — so your demo org stays naturally active between demos.
-It ships **disabled by default**: nothing runs until you turn it on.
-
-See [`daily/README.md`](daily/README.md) for setup (~5 minutes on Mac).
-
+The [daily add-on](daily/README.md) can send demo DMs on weekday mornings
+and at noon, then remove them at night. It runs on your computer and is
+disabled until you turn it on.

@@ -14,7 +14,9 @@ from config import audit_log, load_tokens, save_tokens
 
 
 def main() -> int:
-    token = getpass.getpass("Paste the Bot User OAuth Token (xoxb-...) and press Enter: ").strip()
+    token = getpass.getpass(
+        "Paste the Bot User OAuth Token (xoxb-...) and press Enter. Input is hidden: "
+    ).strip()
     if not token.startswith("xoxb-"):
         print("That doesn't look like a bot token (should start with 'xoxb-').", file=sys.stderr)
         return 1
@@ -41,7 +43,7 @@ def main() -> int:
     print(f"  bot:        {user_name} ({bot_user_id})")
     print(f"  team:       {team}")
     print(f"  enterprise: {enterprise}")
-    confirm = input("Save this as app_token? [y/N]: ").strip().lower()
+    confirm = input("Is this your demo workspace? Type y to save the bot token [y/N]: ").strip().lower()
     if confirm != "y":
         print("Aborted.")
         return 1
@@ -51,7 +53,7 @@ def main() -> int:
     save_tokens(tokens)
     # audit_log uses the new app_token now that it's saved
     audit_log(f":key: Bot token rotated and saved (bot_id `{bot_user_id}`)")
-    print("\nSaved. Bot token is live.")
+    print("\nBot token saved to tokens.json for exact sender verification.")
     return 0
 
 

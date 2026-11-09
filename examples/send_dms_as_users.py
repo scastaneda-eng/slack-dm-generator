@@ -99,7 +99,13 @@ def main() -> int:
     if args.manifest:
         with open(args.manifest, "w") as f:
             json.dump({"sent": sent}, f, indent=2)
-        print(f"\nManifest written to {args.manifest}")
+        print(f"\nCleanup file for this batch: {args.manifest}")
+    elif sent:
+        print("\nTo save a cleanup file for future batches, send with --manifest PATH.")
+
+    print(f"DMs sent: {len(sent)}. Failed: {failures}.")
+    if failures:
+        print("Fix and retry only the failed messages. Use a new cleanup file for the retry.")
 
     return 1 if failures else 0
 

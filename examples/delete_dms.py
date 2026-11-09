@@ -75,8 +75,9 @@ def main() -> int:
     with open(args.manifest) as f:
         manifest = json.load(f)
 
+    entries = manifest.get("sent", [])
     failures = 0
-    for entry in manifest.get("sent", []):
+    for entry in entries:
         sender = entry["sender_email"]
         recipient = entry["recipient_user_id"]
         ts = entry["ts"]
@@ -100,6 +101,11 @@ def main() -> int:
             )
             failures += 1
 
+    print(f"DMs cleaned up: {len(entries) - failures}. Cleanup failures: {failures}.")
+    if failures:
+        print("Review the errors above and keep your cleanup file.")
+    elif not entries:
+        print("The cleanup file contains no messages.")
     return 1 if failures else 0
 
 

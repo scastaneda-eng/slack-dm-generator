@@ -8,9 +8,10 @@ how to install and implement this project.
 
 ## What you should do
 
-- **Setup help** — walk the user through `SETUP.md` one step at a time. Don't
-  paste long blocks of commands; pause after each step and confirm before
-  moving on.
+- **Setup help** — ask which OS the user uses and whether they want
+  one step at a time or a short checklist. For guided setup, give one
+  action at a time and explain what success looks like. In either mode,
+  the user signs into Slack and approves access in the browser.
 - **Showing the manifest** — when the user hits Step 1 (the "paste the
   manifest into Slack" step), open `manifest.json` with the Read tool and
   show the full JSON in chat so the user can copy it. Don't improvise or
@@ -29,50 +30,29 @@ how to install and implement this project.
   shell, so `source .venv/bin/activate` doesn't persist. Always invoke the
   project's Python as `.venv/bin/python <script>` (macOS/Linux) or
   `.venv\Scripts\python.exe <script>` (Windows) instead of activating.
-- **Ask Mac or Windows first.** Before Step 4, ask which OS they're on. The
-  doc is Mac-first; for Windows users, substitute from the
-  `## Windows commands` table at the bottom of `SETUP.md` whenever a command
-  starts with `source`, `cp`, or `python3.12`. Everything else is identical.
+- **Windows commands** — use the PowerShell equivalents in SETUP.md.
 - **After token capture** — always run `.venv/bin/python verify_setup.py`
   and read the output before declaring setup done.
-- **Sending DMs** — copy `examples/send_messages.example.json` to a new file,
-  edit it for the user's demo, then run
-  `.venv/bin/python examples/send_dms_as_users.py --config <file> --manifest sent.json`.
-  Keep the manifest — it's how `delete_dms.py` knows what to remove later.
+- **Sending DMs** — start with the one-message example. Show the sender,
+  recipient, and text for review before sending. Use a new cleanup filename
+  for each batch and keep it for `delete_dms.py`.
 
-## What you must NOT do
+## Credentials and feature scope
 
-- **Never ask the user to paste a token into the chat.** Always route them
-  through `auth_user.py` (browser OAuth) for `xoxp-` user tokens or
-  `save_bot_token.py` (getpass) for the optional `xoxb-` audit-logging token.
-  Re-pasting tokens in chat re-leaks them into transcripts/logs.
+- **Keep credentials local.** The user enters the Client Secret directly in
+  `tokens.json`. Use `auth_user.py` for sender tokens and `save_bot_token.py`
+  for the bot token used for exact sender verification or optional audit
+  logging. Keep all three out of chat.
 - **Don't fabricate features.** This toolkit deliberately omits channel
   management, admin operations, and AI agents. If asked, say so.
 
 ## Critical OAuth gotcha
 
-When `auth_user.py` opens the OAuth URL, it goes to the user's **default**
-browser. If they're logged in to Slack there as a different user (e.g., their
-admin account), Slack silently grants THAT user's token. The script's
-post-capture check (`auth.test` + `users.lookupByEmail`) catches this and
-refuses to save — but to avoid the round trip, **tell the user upfront** to
-copy the printed URL into an **incognito** window logged in as the target
-persona. Incognito shortcut: `Cmd+Shift+N` (Chrome/Edge on Mac),
-`Ctrl+Shift+N` (Chrome/Edge on Windows), or `Ctrl+Shift+P` /
-`Cmd+Shift+P` (Firefox).
-
-**When running `auth_user.py` from a Claude Code session yourself, always
-pass `--no-open`** (`.venv/bin/python -u auth_user.py --email <email> --no-open`).
-That suppresses the default-browser auto-open so only the URL prints in
-chat — the user copies it into incognito intentionally, and there's no
-risk of an extra browser tab silently authorizing the wrong account.
-Document the flag for the user too if they're running the command in
-their own Terminal.
-
-If the user has `app_token` configured in `tokens.json`, verification is
-strict (lookupByEmail). If not, verification falls back to a heuristic
-name-match. Recommend they set up `app_token` for strict verification when
-working with multiple personas.
+Give the user the Step 5 command with `--no-open` to run in Terminal.
+Have them paste the link into a private window signed into Slack as the
+sender, check the Slack account before clicking Allow, and return to
+Terminal for the verification result. Recommend saving the bot token in
+Step 4 for exact email verification.
 
 ## Token rotation
 
@@ -83,7 +63,7 @@ If the user needs to rotate tokens:
    go to **Features → App Manifest** in the Slack app UI and paste an
    updated `manifest.json`, then reinstall.
 2. For the bot token: `.venv/bin/python save_bot_token.py` (getpass).
-3. For user tokens: re-run `.venv/bin/python -u auth_user.py --email <email>` per persona.
+3. For user tokens: re-run `.venv/bin/python -u auth_user.py --email <email> --no-open` per persona.
 4. Reinstalling the app does NOT invalidate already-captured `xoxp-` tokens,
    so you usually only need to re-capture the bot token.
 
