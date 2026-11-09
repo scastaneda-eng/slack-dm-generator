@@ -7,15 +7,13 @@ Setup is one-time, ~15 minutes.
 
 ---
 
-## Two ways to follow this guide — pick whichever fits
+## Choose how to follow this guide
 
-- **Open this folder in Claude Code and ask *"help me set this up."*** Claude reads this guide and
-  [CLAUDE.md](CLAUDE.md) and walks you through it one step at a time,
-  pausing for your confirmation between steps and running the commands
-  for you when it's safe to do so. Best if you're new to Terminal — at
-  any point you can ask Claude to explain what a step does or why.
-- **Read it yourself.** The steps below assume you're comfortable opening a
-  Terminal window, copy-pasting commands, and running them yourself.
+- **Use a coding assistant.** Open the project folder and use the
+  [starter prompt](README.md#pick-your-setup-path). Choose one step at a time
+  or a short checklist. You'll handle sign-in and approval in Slack.
+- **Use Terminal.** Follow the commands below. If you're new to Terminal,
+  start with the primer.
 
 Either path uses the same instructions below. Each command is tagged with
 **[Claude Code]** (Claude can run it for you) or **[Terminal]** (you run
@@ -59,14 +57,10 @@ Replace `path/to/` with wherever you cloned/downloaded it (e.g.
 `cd ~/claude-projects/slack-dm-generator`).
 
 **About `.venv` (Python virtual environment).** Step 3 creates a folder
-called `.venv` inside the project. It's a private, sandboxed copy of Python
-just for this toolkit — that way installing packages here won't affect the
-rest of your system. You'll see the `.venv/` folder appear; that's
-expected. `source .venv/bin/activate` (Step 3) tells *your current Terminal
-window* to use that sandbox. It only lasts for that window — open a new
-Terminal and you'd re-activate it. When running from Claude Code, each
-command runs in a fresh shell, so Claude will call `.venv/bin/python`
-directly instead of activating.
+called `.venv` inside the project. It's a project-specific Python environment. Packages installed there stay
+separate from your system Python. The commands below use the executable
+inside `.venv` directly, so you can run them in any terminal opened in the
+project folder.
 
 ---
 
@@ -168,7 +162,7 @@ in Step 2 (and Step 8) below. It also does nothing for the per-persona
    slack app install --update
    ```
 
-5. **Return to Step 2** to copy your token — that part is unchanged.
+5. **Return to Step 2** to copy your app credentials.
 
 > The CLI does not print your bot/user token, and (for parity with the docs)
 > `slack app link` only records the App ID and Team ID; it does not fetch a
@@ -213,9 +207,9 @@ straightforward.
    - **Client Secret** (click "Show")
 
    You'll paste these into `tokens.json` in Step 4.
-3. (Only if you plan to turn on audit logging in Step 8.) In the sidebar, click
-   **OAuth & Permissions** and copy the **Bot User OAuth Token** (starts with
-   `xoxb-`). Keep it handy — you'll use it in Step 8.
+3. For exact sender verification or optional audit logging, get the
+   **Bot User OAuth Token** (starts with `xoxb-`) under **OAuth & Permissions**.
+   Step 4 shows how to save it locally.
 
 > ℹ The manifest already configured `https://localhost:3000/oauth/callback`
 > as the redirect URL and pre-loaded the scopes the toolkit needs:
@@ -226,8 +220,7 @@ straightforward.
 >   history`, `im:write/read/history`, `mpim:write/history`,
 >   `reactions:read/write`, `files:write`, `pins:write`, `bookmarks:write`,
 >   `users:read`, `canvases:read/write`.
-> - **Bot scopes** (used for the optional audit-logging `xoxb-` token in
->   Step 8): `chat:write`, `chat:write.public`, `users:read`,
+> - **Bot scopes** (used for exact sender verification and optional audit logging): `chat:write`, `chat:write.public`, `users:read`,
 >   `users:read.email`.
 >
 > Nothing to click there — unless your workspace is on **Enterprise Grid**
@@ -270,15 +263,26 @@ sandboxed Python install. It's gitignored, so it won't be committed.
 cp tokens.example.json tokens.json
 ```
 
-Open `tokens.json` and fill in `oauth.client_id` and `oauth.client_secret`
-from Step 2. Leave everything else as-is for now. (If you're in Claude
-Code, you can ask Claude to open the file and help you edit it — just
-paste the client ID/secret from the Slack web UI; don't paste other
-tokens.)
+Open `tokens.json` in a local text editor. Paste the Client ID into
+`oauth.client_id` and the Client Secret into `oauth.client_secret`, then save.
+Leave the other fields as they are.
 
-> ⚠ **Never paste tokens into a chat with Claude Code.** Always use the
-> local scripts (`auth_user.py` for user tokens, `save_bot_token.py` for the
-> optional bot token). Pasting tokens into chat re-leaks them.
+> Keep the Client Secret and Slack tokens out of chat. Enter the Client
+> Secret directly in the local file and use the scripts to save Slack tokens.
+
+### Recommended — enable exact sender verification
+
+Before authorizing a sender, save the **Bot User OAuth Token** from
+**OAuth & Permissions** in the Slack app settings. **[Terminal]** run:
+
+```bash
+.venv/bin/python save_bot_token.py
+```
+
+Paste the token at the hidden prompt and press Enter. Check the displayed
+workspace before confirming. This lets the tool match each sender's email
+to their Slack account. Leave `audit_channel_id` empty if you only want
+sender verification.
 
 ---
 
@@ -305,39 +309,20 @@ Repeat the checklist below once per persona.
    - Incognito shortcut: `Cmd+Shift+N` (Chrome/Edge on Mac), `Ctrl+Shift+N`
      (Chrome/Edge on Windows), `Cmd+Shift+P` / `Ctrl+Shift+P` (Firefox).
 
-2. **Run the script** (in your Terminal, not in Claude Code):
+2. **Run this in Terminal**, replacing the example email with the sender's
+   Slack email. Keep Terminal open while you work in the browser.
    ```bash
-   .venv/bin/python -u auth_user.py --email persona@yourorg.com
+   .venv/bin/python -u auth_user.py --email persona@yourorg.com --no-open
    ```
-   - The `-u` (unbuffered) flag makes the OAuth URL print **before** the
-     script blocks waiting for the callback.
-   - Add `--no-open` if you're running this through Claude Code, or any
-     time your default browser is signed into Slack as someone other than
-     the persona you're capturing:
-     ```bash
-     .venv/bin/python -u auth_user.py --email persona@yourorg.com --no-open
-     ```
-     Without it, the script auto-opens your default browser on top of the
-     URL it prints — easy to accidentally click "Allow" in the wrong
-     window. `--no-open` skips that round trip entirely.
+   The script prints a link. With `--no-open`, you choose where to open it.
 
-3. **Copy the OAuth URL the script prints, and paste it into the incognito
-   window from step 1** — *not* your default browser.
-   - **Why incognito matters:** Slack's OAuth URL is identity-blind. It
-     grants a token for whichever Slack user is signed into the browser
-     that loads it. Your normal browser is signed in as Jennifer, so a
-     URL loaded there would issue a Jennifer token. The incognito window
-     gives you a clean slate signed into Slack only as the persona, so
-     the token belongs to the persona.
-   - If the script auto-opened a tab in your default browser (i.e., you
-     didn't pass `--no-open`), **ignore that tab** — close it or just
-     don't click "Allow" in it.
-   - Your browser will warn about a self-signed cert on `localhost`. Click
-     **advanced → proceed**.
+3. **Paste the link into the private window from step 1.** Check which Slack
+   account is shown on the approval screen, then click **Allow**.
 
-4. **Click Allow on Slack's authorization page** (in the incognito window).
-   The script captures the token, verifies it belongs to the persona, and
-   either saves it to `tokens.json` or rejects it.
+4. **Finish the browser callback, then check Terminal.** If the browser
+   warns about the certificate after you click Allow, verify that the
+   address is `https://localhost:3000/oauth/callback` before continuing.
+   In Terminal, look for **Saved to tokens.json**.
 
 5. **If verification rejects:** the script will print a checklist of the
    most likely causes. Fix the cause in the incognito window (or the
@@ -373,9 +358,10 @@ Repeat the checklist below once per persona.
 .venv/bin/python verify_setup.py
 ```
 
-Should print every persona email + matching user ID and end with
-`READY — all checks passed.` If anything is flagged, fix it before moving on.
-In Claude Code, Claude can run this and read the output back to you.
+With at least one working sender, the script lists each sender account and
+ends with a `READY` message if the checks pass. The output tells you whether
+it verified the sender's exact identity by email. Resolve failed checks
+before moving on.
 
 ---
 
@@ -387,19 +373,24 @@ In Claude Code, Claude can run this and read the output back to you.
    ```bash
    cp examples/send_messages.example.json my_demo.json
    ```
-2. Edit `my_demo.json` — replace the `sender_email` (must be one of your
-   captured personas) and `recipient_user_id` (the Slack user ID of who
-   should receive the DM). In Claude Code, you can ask Claude to open and
-   edit the file for you.
-3. Send:
+2. Edit the single message in `my_demo.json`. Set `sender_email` to the
+   demo account you authorized, and put your message in `text`. To find
+   `recipient_user_id`, open the recipient's profile in the demo workspace,
+   choose the three-dot menu, then [**Copy member ID**](https://slack.com/help/articles/360003827751-Create-a-link-to-a-members-profile). Paste that ID into
+   the file. A coding assistant can help edit this message file.
+3. Review the sender, recipient, and text, then send:
    ```bash
-   .venv/bin/python examples/send_dms_as_users.py --config my_demo.json --manifest sent.json
+   .venv/bin/python examples/send_dms_as_users.py --config my_demo.json --manifest demo-test-cleanup.json
    ```
-4. Confirm the DM appears in the recipient's Slack.
+4. Confirm one DM was sent and appears in the recipient's Slack. Keep
+   `demo-test-cleanup.json`, the file that records which DM to remove.
 
-To clean up:
+To remove the test DM, run this command and check that the message is gone.
+Use a new cleanup filename for each batch because sending again with the
+same filename replaces the previous record.
+
 ```bash
-.venv/bin/python examples/delete_dms.py --manifest sent.json
+.venv/bin/python examples/delete_dms.py --manifest demo-test-cleanup.json
 ```
 
 ---
@@ -411,24 +402,14 @@ If you want every send/delete logged automatically to a Slack channel:
 1. Create a dedicated channel in your demo org (e.g., `#demo-audit-log`).
    Right-click → **View channel details** → copy the channel ID at the
    bottom (starts with `C`).
-2. **[Terminal]** — run this in a dedicated Terminal window (the script
-   uses a hidden paste prompt and a `y/N` confirm, which Claude Code's
-   runner can't drive):
-   ```bash
-   .venv/bin/python save_bot_token.py
-   ```
-   Paste the `xoxb-` token you copied in Step 2. **Your keystrokes won't
-   appear on screen — that's intentional (`getpass` hides them so tokens
-   don't show up in scrollback). Just paste and press Enter.**
-   > ℹ Didn't copy the bot token in Step 2? Go back to your app at
-   > api.slack.com → **OAuth & Permissions** → copy the **Bot User OAuth
-   > Token** (`xoxb-...`) and return here.
+2. If you haven't already saved the bot token, follow the
+   [exact sender verification instructions in Step 4](#recommended--enable-exact-sender-verification).
 3. Open `tokens.json` and set `audit_channel_id` to the channel ID from
    step 1.
 4. **[Claude Code]** Re-run `.venv/bin/python verify_setup.py` — you should
-   now see audit logging green.
+   see that the audit channel resolves.
 
-If you don't do this, audit logging silently no-ops. The toolkit still works.
+Audit logging is enabled when a bot token and an audit channel are both set.
 
 > ℹ The manifest already ships the bot scopes this feature needs
 > (`chat:write`, `chat:write.public`, `users:read`, `users:read.email`), so there's no
@@ -444,8 +425,8 @@ If you need to rotate (e.g., a token leaked):
 | Token | How to rotate |
 |---|---|
 | `client_secret` | Slack app → Basic Information → Regenerate. Update `tokens.json`. |
-| Bot `xoxb-` (audit) | Reinstall app → copy new token → `.venv/bin/python save_bot_token.py`. |
-| Persona `xoxp-` | Re-run `.venv/bin/python -u auth_user.py --email persona@yourorg.com`. |
+| Bot `xoxb-` | Reinstall app → copy new token → `.venv/bin/python save_bot_token.py`. |
+| Persona `xoxp-` | Re-run `.venv/bin/python -u auth_user.py --email persona@yourorg.com --no-open`. |
 
 Reinstalling the app does **not** invalidate existing user (`xoxp-`) tokens.
 
@@ -459,7 +440,7 @@ Reinstalling the app does **not** invalidate existing user (`xoxp-`) tokens.
 | File | Purpose |
 |---|---|
 | `auth_user.py` | OAuth flow — captures one persona's `xoxp-` per run |
-| `save_bot_token.py` | Paste path for the optional audit-logging `xoxb-` token |
+| `save_bot_token.py` | Save the bot token for exact sender verification and optional audit logging |
 | `verify_setup.py` | Diagnostic — confirms tokens.json is wired up correctly |
 | `config.py` | Shared helpers (token loading, audit_log) |
 | `examples/send_dms_as_users.py` | Send a list of DMs from different personas |
@@ -475,7 +456,8 @@ Reinstalling the app does **not** invalidate existing user (`xoxp-`) tokens.
 haven't filled in `tokens.json`. See Step 4.
 
 **Browser shows "Your connection is not private"** — Expected. The toolkit
-uses a self-signed cert for the OAuth callback. Click **advanced → proceed**.
+uses a self-signed cert for the OAuth callback. Verify the address is
+`https://localhost:3000/oauth/callback` before continuing.
 
 **`auth_user.py` says "VERIFICATION FAILED — token NOT saved"** — You
 authorized in a browser logged in as the wrong user. Re-run in incognito as

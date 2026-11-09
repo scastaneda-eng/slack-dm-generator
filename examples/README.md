@@ -1,7 +1,7 @@
 # Examples
 
-These scripts are **reference patterns**, not production tools. Copy and edit
-them for your own demo — don't expect to run them as-is.
+Use these scripts to send and clean up demo DMs. Copy and edit the
+[one-message example](send_messages.example.json) for your first run.
 
 | Script | What it does |
 |---|---|
@@ -24,8 +24,11 @@ and the real target. See `delete_dms.py` for the implementation.
 ```bash
 # 1. Write a JSON file describing what to send (see send_messages.example.json)
 # 2. Send:
-.venv/bin/python examples/send_dms_as_users.py --config send_messages.json --manifest sent.json
+.venv/bin/python examples/send_dms_as_users.py --config send_messages.json --manifest demo-test-cleanup.json
 
 # 3. Later, to delete:
-.venv/bin/python examples/delete_dms.py --manifest sent.json
+.venv/bin/python examples/delete_dms.py --manifest demo-test-cleanup.json
 ```
+
+Keep the cleanup file and give each batch a new filename. Sending again to
+the same path replaces its previous cleanup record.

@@ -1,7 +1,7 @@
 """One-time OAuth flow to capture a user's xoxp- token.
 
 Usage:
-    .venv/bin/python -u auth_user.py --email persona@yourorg.com
+    .venv/bin/python -u auth_user.py --email persona@yourorg.com --no-open
 
 The `-u` flag (unbuffered) ensures the OAuth URL prints before the script
 blocks on the local callback server — important when you need to copy the
@@ -128,7 +128,11 @@ class CallbackHandler(http.server.BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header("Content-Type", "text/html")
         self.end_headers()
-        body = b"<h2>Authorized.</h2><p>You can close this tab.</p>"
+        body = (
+            b"<h2>Slack returned control to the setup tool.</h2>"
+            b"<p>Switch back to Terminal to see whether the sender account "
+            b"was verified and saved.</p>"
+        )
         self.wfile.write(body)
 
 
@@ -260,26 +264,14 @@ def main() -> int:
     print("OAuth URL:")
     print(f"  {url}")
     print()
-    print(f"IMPORTANT — copy that URL into an INCOGNITO browser window signed")
-    print(f"into Slack as {args.email}.")
-    print()
-    print("Why incognito: Slack's OAuth URL is identity-blind — it grants a token")
-    print("for whichever Slack user is signed into the browser that loads it. Your")
-    print("default browser is probably signed in as Jennifer (or your primary demo")
-    print("persona), so loading the URL there would issue HER token, not the")
-    print("persona's. The incognito window gives you a clean session signed in as")
-    print("the persona only. The verification step below will catch and reject the")
-    print("wrong-user case, but incognito avoids the round trip.")
-    print()
-    if args.no_open:
-        print("(--no-open passed — not opening your default browser. Paste the URL")
-        print("above into your incognito window manually.)")
-    else:
-        print("(I'll also try to open your default browser as a convenience — ignore")
-        print("it if you don't need it. Pass --no-open to skip the auto-open.)")
-    print()
-    print("Note: your browser will warn about the self-signed cert on localhost —")
-    print("click 'advanced -> proceed' to continue.")
+    print("Keep this Terminal window open.")
+    print(f"Open the link in a private browser window signed into Slack as {args.email}.")
+    print("Check the Slack account on the approval screen before clicking Allow.")
+    if not args.no_open:
+        print("Use the printed link in the private window. Pass --no-open to skip")
+        print("opening a tab in your default browser next time.")
+    print("If the browser shows a certificate warning after you click Allow,")
+    print("check that the address is https://localhost:3000/oauth/callback before continuing.")
     print()
     if not args.no_open:
         webbrowser.open(url)
